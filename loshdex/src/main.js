@@ -6,24 +6,27 @@ import {
 import "@babylonjs/loaders";
 
 // Configuration Parameters (Adjust these values)
+// Replace your CONFIG with this
 const CONFIG = {
   BACKGROUND_COLOR: new Color3(0.1, 0.1, 0.1),
-  CAMERA_ALPHA: Math.PI / 3,
+  CAMERA_ALPHA: Math.PI / 4,
   CAMERA_BETA: Math.PI / 3,
-  CAMERA_RADIUS: 400,
-  CAMERA_TARGET: new Vector3(0, 300, 0),
-  LIGHT1_POSITION: new Vector3(1, 1, 0),
-  LIGHT2_POSITION: new Vector3(-1, -1, 0),
-  DISK_MIN_SIZE: 1,
-  DISK_MAX_SIZE: 4,
-  DISK_DEPTH: 20,
-  GLOW_INTENSITY: 0.3,
-  COLOR_EMISSIVE_MULTIPLIERS: 20,
+  CAMERA_RADIUS: 3500,
+  CAMERA_TARGET: new Vector3(0, 0, 0),
+  LIGHT1_POSITION: new Vector3(1000, 1000, 0),
+  LIGHT2_POSITION: new Vector3(-1000, -1000, 0),
+  DISK_MIN_SIZE: 100,
+  DISK_MAX_SIZE: 600,
+  DISK_THICKNESS: 20,
+  GLOW_INTENSITY: 0.5,
+  COLOR_EMISSIVE_MULTIPLIERS: 8,
   DISK_SPACING_MULTIPLIER: 1.5,
-  STARTING_Y_POSITION: 200,
-  STARTING_X_POSITION: -200, // Added for horizontal orientation
-  MODEL_DIRECTION: 'horizontal' // 'horizontal' or 'vertical'
+  STARTING_Y_POSITION: 0,
+  STARTING_X_POSITION: 0,
+  MODEL_DIRECTION: 'horizontal'
 };
+
+// Rest of your code remains unchanged...
 
 // Predefined list of 30 distinct rainbow colors
 const RAINBOW_COLORS = {
@@ -56,7 +59,7 @@ const RAINBOW_COLORS = {
   'Amber': new Color3(1, 0.7, 0.2),
   'Lilac': new Color3(0.8, 0.6, 1),
   'Rose': new Color3(1, 0.4, 0.7),
-  'Gray': new Color3(0.5, 0.5, 0.5)  // Fallback color
+  'Gray': new Color3(0.5, 0.5, 0.5)
 };
 
 // DOM Elements
@@ -112,7 +115,6 @@ function assignLayerColor(layerName) {
   if (!layerColorAssignments[layerName]) {
     const colorNames = Object.keys(RAINBOW_COLORS);
     const colorCount = Object.keys(layerColorAssignments).length;
-    
     layerColorAssignments[layerName] = 
       colorCount >= colorNames.length - 1 
         ? RAINBOW_COLORS['Gray']
@@ -133,7 +135,9 @@ function createModelDisks(layerData) {
   
   layerData.forEach((layer, index) => {
     const layerCleanName = getCleanLayerName(layer.name);
-    const diskSize = CONFIG.DISK_MIN_SIZE + 
+    
+    // Calculate tile size based on numel (square tiles)
+    const tileSize = CONFIG.DISK_MIN_SIZE + 
       ((Math.log(layer.numel) - logMinSize) / (logMaxSize - logMinSize)) * 
       (CONFIG.DISK_MAX_SIZE - CONFIG.DISK_MIN_SIZE);
     
@@ -141,21 +145,37 @@ function createModelDisks(layerData) {
     diskMaterial.diffuseColor = assignLayerColor(layerCleanName);
     diskMaterial.emissiveColor = diskMaterial.diffuseColor.scale(CONFIG.COLOR_EMISSIVE_MULTIPLIERS);
     
-    console.log(`Layer: ${layerCleanName}, Color:`, diskMaterial.diffuseColor);
+    console.log(`Layer: ${layerCleanName}, Tile Size: ${tileSize}`);
+    
+    // Define dimensions based on MODEL_DIRECTION
+    let boxOptions;
+    if (CONFIG.MODEL_DIRECTION === 'horizontal') {
+      boxOptions = {
+        width: CONFIG.DISK_THICKNESS, // Thickness along X-axis
+        height: tileSize,             // Square dimension
+        depth: tileSize               // Square dimension
+      };
+    } else { // vertical
+      boxOptions = {
+        width: tileSize,              // Square dimension
+        height: CONFIG.DISK_THICKNESS,// Thickness along Y-axis
+        depth: tileSize               // Square dimension
+      };
+    }
     
     const diskMesh = MeshBuilder.CreateBox(
       `disk_layer_${index}`, 
-      { width: diskSize, height: diskSize, depth: CONFIG.DISK_DEPTH }, 
+      boxOptions, 
       currentScene
     );
     
     // Position based on MODEL_DIRECTION
     if (CONFIG.MODEL_DIRECTION === 'horizontal') {
       diskMesh.position = new Vector3(currentXPosition, 0, 0);
-      currentXPosition += diskSize * CONFIG.DISK_SPACING_MULTIPLIER;
+      currentXPosition += CONFIG.DISK_THICKNESS * CONFIG.DISK_SPACING_MULTIPLIER;
     } else { // vertical
       diskMesh.position = new Vector3(0, currentYPosition, 0);
-      currentYPosition += diskSize * CONFIG.DISK_SPACING_MULTIPLIER;
+      currentYPosition += CONFIG.DISK_THICKNESS * CONFIG.DISK_SPACING_MULTIPLIER;
     }
     
     diskMesh.material = diskMaterial;
@@ -165,8 +185,10 @@ function createModelDisks(layerData) {
   // Adjust camera target based on direction
   if (CONFIG.MODEL_DIRECTION === 'horizontal') {
     mainCamera.target = new Vector3(currentXPosition / 2, 0, 0);
+    mainCamera.radius = currentXPosition * 1.5;
   } else {
     mainCamera.target = new Vector3(0, currentYPosition / 2, 0);
+    mainCamera.radius = currentYPosition * 1.5;
   }
   
   return diskMeshes;
