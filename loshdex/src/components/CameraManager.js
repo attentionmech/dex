@@ -25,7 +25,7 @@ export class CameraManager {
     this.setupDragHandler();
   }
 
-  setMode(mode, target = CONFIG.CAMERA_TARGET, extent = 1600) {
+  setMode(mode, target = CONFIG.CAMERA_TARGET, extent = 1300) {
     this.currentMode = mode;
     this.camera.target = target;
     switch (mode) {
@@ -38,19 +38,19 @@ export class CameraManager {
       case "side":
         this.camera.alpha = Math.PI / 2;
         this.camera.beta = Math.PI / 2;
-        this.camera.radius = extent * 1.2;
+        this.camera.radius = extent * 2.2;
         this.camera.detachControl();
         break;
       case "top":
         this.camera.alpha = 0;
         this.camera.beta = 0;
-        this.camera.radius = extent * 1.5;
+        this.camera.radius = extent * 2.5;
         this.camera.detachControl();
         break;
       case "free":
         this.camera.alpha = CONFIG.CAMERA_ALPHA;
         this.camera.beta = CONFIG.CAMERA_BETA;
-        this.camera.radius = extent * 1.5;
+        this.camera.radius = extent * 2.5;
         this.camera.attachControl(this.canvas, true);
         break;
       default:
