@@ -2,7 +2,7 @@ import { Scene, HemisphericLight, Vector3, GlowLayer } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
 import { CONFIG } from "../commons/Configs";
 
-class SceneMaker {
+class UIMaker {
   constructor(engine) {
     this.engine = engine;
     this.scene = this.createScene();
@@ -83,4 +83,4 @@ class SceneMaker {
   }
 }
 
-export { SceneMaker };
+export { UIMaker };
