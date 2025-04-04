@@ -1,5 +1,7 @@
-import { ArcRotateCamera, Vector3 } from "@babylonjs/core";
 import { CONFIG } from "../commons/Configs";
+import { ArcRotateCamera, Vector3, PointerEventTypes } from "@babylonjs/core";
+
+
 
 export class CameraManager {
   constructor(scene, canvas, dexModelVisualizer) {
@@ -18,8 +20,8 @@ export class CameraManager {
     this.dexModelVisualizer = dexModelVisualizer; // Reference to DexModelVisualizer
     this.isDragging = false;
     this.lastMouseX = null;
-    this.currentMode = "interactive";
-    this.setMode("interactive"); // Initial mode
+    this.currentMode = "free";
+    this.setMode("free"); // Initial mode
     this.setupDragHandler();
   }
 
@@ -45,7 +47,7 @@ export class CameraManager {
         this.camera.radius = extent * 1.5;
         this.camera.detachControl();
         break;
-      case "interactive":
+      case "free":
         this.camera.alpha = CONFIG.CAMERA_ALPHA;
         this.camera.beta = CONFIG.CAMERA_BETA;
         this.camera.radius = extent * 1.5;
@@ -62,31 +64,38 @@ export class CameraManager {
   }
 
   setupDragHandler() {
-    this.scene.onPointerDown = (evt) => {
-      if (this.currentMode !== "interactive" && evt.button === 0) { // Left mouse button
-        this.isDragging = true;
-        this.lastMouseX = evt.clientX;
+    this.scene.onPointerObservable.add((pointerInfo) => {
+      const evt = pointerInfo.event;
+      switch (pointerInfo.type) {
+        case PointerEventTypes.POINTERDOWN:
+          if (this.currentMode !== "free" && evt.button === 0) {
+            this.isDragging = true;
+            this.lastMouseX = evt.clientX;
+          }
+          break;
+  
+        case PointerEventTypes.POINTERMOVE:
+          if (this.isDragging && this.currentMode !== "free") {
+            const currentMouseX = evt.clientX;
+            const deltaX = currentMouseX - this.lastMouseX;
+            this.moveModel(deltaX);
+            this.lastMouseX = currentMouseX;
+          }
+          break;
+  
+        case PointerEventTypes.POINTERUP:
+          this.isDragging = false;
+          this.lastMouseX = null;
+          break;
       }
-    };
-
-    this.scene.onPointerMove = (evt) => {
-      if (this.isDragging && this.currentMode !== "interactive") {
-        const currentMouseX = evt.clientX;
-        const deltaX = currentMouseX - this.lastMouseX;
-        this.moveModel(deltaX);
-        this.lastMouseX = currentMouseX;
-      }
-    };
-
-    this.scene.onPointerUp = () => {
-      this.isDragging = false;
-      this.lastMouseX = null;
-    };
+    });
   }
+  
 
   moveModel(deltaX) {
+    
     const direction = CONFIG.MODEL_DIRECTION.clone().normalize();
-    const moveSpeed = 5; // Adjust this sensitivity as needed
+    const moveSpeed = 100; // Adjust this sensitivity as needed
     const displacement = direction.scale(deltaX * moveSpeed);
     this.dexModelVisualizer.moveModelRoot(displacement);
   }
