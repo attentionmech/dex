@@ -7,29 +7,54 @@ import "@babylonjs/loaders";
 
 // Configuration Parameters (Adjust these values)
 const CONFIG = {
-  // Scene
-  BACKGROUND_COLOR: new Color3(0.1, 0.1, 0.1),  // Pitch black
-  
-  // Camera
+  BACKGROUND_COLOR: new Color3(0.1, 0.1, 0.1),
   CAMERA_ALPHA: Math.PI / 3,
   CAMERA_BETA: Math.PI / 3,
   CAMERA_RADIUS: 400,
-  CAMERA_TARGET: new Vector3(0,300,0),// how to change this
-  
-  // Lighting
+  CAMERA_TARGET: new Vector3(0, 300, 0),
   LIGHT1_POSITION: new Vector3(1, 1, 0),
   LIGHT2_POSITION: new Vector3(-1, -1, 0),
-  
-  // Disk Appearance
   DISK_MIN_SIZE: 1,
   DISK_MAX_SIZE: 4,
   DISK_DEPTH: 20,
   GLOW_INTENSITY: 0.3,
   COLOR_EMISSIVE_MULTIPLIERS: 20,
-  
-  // Positioning
   DISK_SPACING_MULTIPLIER: 1.5,
   STARTING_Y_POSITION: 200
+};
+
+// Predefined list of 30 distinct rainbow colors
+const RAINBOW_COLORS = {
+  'Red': new Color3(1, 0, 0),
+  'Orange': new Color3(1, 0.5, 0),
+  'Yellow': new Color3(1, 1, 0),
+  'Lime': new Color3(0.5, 1, 0),
+  'Green': new Color3(0, 1, 0),
+  'Emerald': new Color3(0, 1, 0.5),
+  'Cyan': new Color3(0, 1, 1),
+  'SkyBlue': new Color3(0, 0.5, 1),
+  'Blue': new Color3(0, 0, 1),
+  'Indigo': new Color3(0.5, 0, 1),
+  'Violet': new Color3(1, 0, 1),
+  'Magenta': new Color3(1, 0, 0.5),
+  'Pink': new Color3(1, 0.5, 0.5),
+  'Coral': new Color3(1, 0.5, 0.3),
+  'Salmon': new Color3(1, 0.6, 0.5),
+  'Gold': new Color3(1, 0.8, 0),
+  'Olive': new Color3(0.5, 0.5, 0),
+  'Teal': new Color3(0, 0.5, 0.5),
+  'Turquoise': new Color3(0, 1, 0.8),
+  'Lavender': new Color3(0.8, 0.8, 1),
+  'Plum': new Color3(0.5, 0, 0.5),
+  'Maroon': new Color3(0.5, 0, 0),
+  'Crimson': new Color3(0.8, 0, 0.2),
+  'Peach': new Color3(1, 0.8, 0.6),
+  'Mint': new Color3(0.6, 1, 0.8),
+  'Azure': new Color3(0.5, 0.8, 1),
+  'Amber': new Color3(1, 0.7, 0.2),
+  'Lilac': new Color3(0.8, 0.6, 1),
+  'Rose': new Color3(1, 0.4, 0.7),
+  'Gray': new Color3(0.5, 0.5, 0.5)  // Fallback color
 };
 
 // DOM Elements
@@ -83,9 +108,14 @@ function getCleanLayerName(originalName) {
 
 function assignLayerColor(layerName) {
   if (!layerColorAssignments[layerName]) {
+    const colorNames = Object.keys(RAINBOW_COLORS);
     const colorCount = Object.keys(layerColorAssignments).length;
-    const hue = colorCount * 40 % 360;
-    layerColorAssignments[layerName] = Color3.FromHSV(hue / 360, hue/180, hue/90);
+    
+    // If we've used all colors except Gray, use Gray; otherwise use next color
+    layerColorAssignments[layerName] = 
+      colorCount >= colorNames.length - 1 
+        ? RAINBOW_COLORS['Gray']
+        : RAINBOW_COLORS[colorNames[colorCount]];
   }
   return layerColorAssignments[layerName];
 }
@@ -117,7 +147,6 @@ function createModelDisks(layerData) {
       currentScene
     );
     
-    // Position control - only changes Y coordinate
     diskMesh.position = new Vector3(0, currentYPosition, 0);
     diskMesh.material = diskMaterial;
     diskMeshes.push(diskMesh);
