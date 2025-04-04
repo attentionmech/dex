@@ -63,51 +63,46 @@ export class DexModelVisualizer {
     const layerSizes = layerData.map(layer => layer.numel);
     const logMinSize = Math.min(...layerSizes.map(Math.log));
     const logMaxSize = Math.max(...layerSizes.map(Math.log));
-    let currentYPosition = CONFIG.STARTING_Y_POSITION;
-    let currentXPosition = 0;
+    let currentPosition = CONFIG.START_POSITION.clone();
+    const direction = CONFIG.MODEL_DIRECTION.clone().normalize();
     this.disks = [];
-
+  
     layerData.forEach((layer, index) => {
       const layerCleanName = this.getCleanLayerName(layer.name);
       const tileSize = CONFIG.DISK_MIN_SIZE +
         ((Math.log(layer.numel) - logMinSize) / (logMaxSize - logMinSize)) *
         (CONFIG.DISK_MAX_SIZE - CONFIG.DISK_MIN_SIZE);
-
+  
       const material = new StandardMaterial(`material_layer_${index}`, this.scene);
       material.diffuseColor = this.assignLayerColor(layerCleanName);
       material.emissiveColor = material.diffuseColor.scale(CONFIG.COLOR_EMISSIVE_MULTIPLIERS);
-
-      const boxOptions = CONFIG.MODEL_DIRECTION === 'horizontal'
-        ? { width: CONFIG.DISK_THICKNESS, height: tileSize, depth: tileSize }
-        : { width: tileSize, height: CONFIG.DISK_THICKNESS, depth: tileSize };
-
+  
+      const absDir = new Vector3(
+        Math.abs(direction.x),
+        Math.abs(direction.y),
+        Math.abs(direction.z)
+      );
+      const boxOptions = {
+        width: absDir.x > 0.5 ? CONFIG.DISK_THICKNESS : tileSize,
+        height: absDir.y > 0.5 ? CONFIG.DISK_THICKNESS : tileSize,
+        depth: absDir.z > 0.5 ? CONFIG.DISK_THICKNESS : tileSize
+      };
+  
       const disk = MeshBuilder.CreateBox(`disk_layer_${index}`, boxOptions, this.scene);
-      disk.position = CONFIG.MODEL_DIRECTION === 'horizontal'
-        ? new Vector3(currentXPosition, 0, 0)
-        : new Vector3(0, currentYPosition, 0);
-
-      if (CONFIG.MODEL_DIRECTION === 'horizontal') {
-        currentXPosition += CONFIG.DISK_THICKNESS * CONFIG.DISK_SPACING_MULTIPLIER;
-      } else {
-        currentYPosition += CONFIG.DISK_THICKNESS * CONFIG.DISK_SPACING_MULTIPLIER;
-      }
-
-      //LABELS
+      disk.position = currentPosition.clone();
+      
+      currentPosition.addInPlace(direction.scale(CONFIG.DISK_THICKNESS * CONFIG.DISK_SPACING_MULTIPLIER));
+  
       const labelPlane = this.createLabelPlane(layerCleanName, this.scene);
-
-      // Position label above the disk
       labelPlane.position = disk.position.clone();
-      if (CONFIG.MODEL_DIRECTION === 'horizontal') {
-        labelPlane.position.y += tileSize / 2 + 30;
-      } else {
-        labelPlane.position.y += CONFIG.DISK_THICKNESS / 2 + 30;
-      }
-
-      // Make label follow the disk
+      
+      const upVector = direction.clone().cross(new Vector3(0, 1, 0)).length() < 0.1 
+        ? new Vector3(1, 0, 0) 
+        : new Vector3(0, 1, 0);
+      const labelOffset = upVector.scale(tileSize / 2 + 30);
+      labelPlane.position.addInPlace(labelOffset);
       labelPlane.parent = disk;
-
-
-
+  
       disk.material = material;
       disk.actionManager = new ActionManager(this.scene);
       disk.actionManager.registerAction(
@@ -127,19 +122,15 @@ export class DexModelVisualizer {
         })
       );
       
-
       disk.parent = this.modelRoot;
-
       this.disks.push(disk);
     });
-
+  
     this.scene.onPointerDown = (evt, pickInfo) => {
-      // Ignore if click hit a mesh and it's one of the disks
       if (pickInfo.hit && this.selectedDisk && this.modelRoot.getChildren().includes(pickInfo.pickedMesh)) {
-        return; // Don't reset if clicking a disk
+        return;
       }
     
-      // Else reset everything
       this.selectedDisk = null;
       this.disks.forEach(disk => {
         const mat = disk.material;
@@ -150,13 +141,11 @@ export class DexModelVisualizer {
       });
     };
     
-    
-
-    const extent = CONFIG.MODEL_DIRECTION === 'horizontal' ? currentXPosition : currentYPosition;
-    const target = CONFIG.MODEL_DIRECTION === 'horizontal'
-      ? new Vector3(currentXPosition / 2, 0, 0)
-      : new Vector3(0, currentYPosition / 2, 0);
-
+    // Updated extent and target calculation
+    const extent = CONFIG.DISK_THICKNESS * CONFIG.DISK_SPACING_MULTIPLIER * layerData.length;
+    const target = CONFIG.START_POSITION.clone()
+      .add(direction.scale(extent / 2));
+  
     const disks = this.disks;
     return { disks, target, extent };
   }
