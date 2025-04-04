@@ -1,27 +1,27 @@
 import { Engine } from "@babylonjs/core";
 import "@babylonjs/loaders";
 import { CameraManager } from "../components/CameraManager";
+import { SceneMaker } from "../components/SceneMaker";
 import { SceneManager } from "../components/SceneManager";
-import { ModelManager } from "../components/ModelManager";
 
 class AppManager {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.engine = new Engine(this.canvas, true);
-    this.sceneManager = new SceneManager(this.engine);
-    this.cameraManager = new CameraManager(this.sceneManager.scene, this.canvas);
-    this.modelManager = new ModelManager(
-      this.sceneManager.scene,
+    this.sceneMaker = new SceneMaker(this.engine);
+    this.cameraManager = new CameraManager(this.sceneMaker.scene, this.canvas);
+    this.sceneManager = new SceneManager(
+      this.sceneMaker.scene,
       this.cameraManager,
-      this.sceneManager.uiComponents.panelText
+      this.sceneMaker.uiComponents.panelText
     );
   }
 
   // Initialize the application
   async initialize() {
-    await this.modelManager.loadModelData();
-    this.sceneManager.setupUI(this.modelManager.modelData, (modelName) =>
-      this.modelManager.renderModel(modelName)
+    await this.sceneManager.loadModelData();
+    this.sceneMaker.setupUI(this.sceneManager.modelData, (modelName) =>
+      this.sceneManager.renderModel(modelName)
     );
     this.startRenderLoop();
     this.setupResizeHandler();
@@ -29,7 +29,7 @@ class AppManager {
 
   // Start the render loop
   startRenderLoop() {
-    this.engine.runRenderLoop(() => this.sceneManager.scene.render());
+    this.engine.runRenderLoop(() => this.sceneMaker.scene.render());
   }
 
   // Setup resize event listener

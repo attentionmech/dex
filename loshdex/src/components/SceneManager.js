@@ -1,86 +1,117 @@
-import { Scene, HemisphericLight, Vector3, GlowLayer } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
+import { StandardMaterial, MeshBuilder, Vector3, ActionManager, ExecuteCodeAction } from "@babylonjs/core";
 import { CONFIG } from "../commons/Configs";
+import { RAINBOW_COLORS } from "../commons/Constants";
 
-class SceneManager {
-  constructor(engine) {
-    this.engine = engine;
-    this.scene = this.createScene();
-    this.lights = this.setupLights();
-    this.glow = this.setupGlow();
-    this.uiComponents = this.setupInfoPanel();
+export class SceneManager {
+  constructor(scene, cameraManager, panelText) {
+    this.scene = scene;
+    this.cameraManager = cameraManager;
+    this.panelText = panelText;
+    this.layerColorAssignments = {};
+    this.activeDisks = [];
+    this.modelData = {};
   }
 
-  // Scene Setup
-  createScene() {
-    const scene = new Scene(this.engine);
-    scene.clearColor = CONFIG.BACKGROUND_COLOR;
-    return scene;
+  async loadModelData() {
+    try {
+      const response = await fetch("/model_info.json");
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      const data = await response.json();
+      console.log("Loaded model information:", data);
+      this.modelData = data;
+      return data;
+    } catch (error) {
+      console.error("Error loading JSON:", error);
+      this.modelData = {};
+      return {};
+    }
   }
 
-  // Lighting Setup
-  setupLights() {
-    const upperLight = new HemisphericLight("upperLight", new Vector3(1000, 1000, 0), this.scene);
-    const lowerLight = new HemisphericLight("lowerLight", new Vector3(-1000, -1000, 0), this.scene);
-    return [upperLight, lowerLight];
+  getCleanLayerName(originalName) {
+    return originalName.replace(/\.\d+\./g, ".");
   }
 
-  // Glow Effect Setup
-  setupGlow() {
-    const glow = new GlowLayer("glowEffect", this.scene);
-    glow.intensity = CONFIG.GLOW_INTENSITY;
-    return glow;
+  assignLayerColor(layerName) {
+    if (!this.layerColorAssignments[layerName]) {
+      const colorNames = Object.keys(RAINBOW_COLORS);
+      const colorCount = Object.keys(this.layerColorAssignments).length;
+      this.layerColorAssignments[layerName] =
+        colorCount >= colorNames.length - 1
+          ? RAINBOW_COLORS['Gray']
+          : RAINBOW_COLORS[colorNames[colorCount]];
+    }
+    return this.layerColorAssignments[layerName];
   }
 
-  // GUI Setup for Info Panel
-  setupInfoPanel() {
-    const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-    const infoPanel = new Rectangle();
-    infoPanel.width = CONFIG.PANEL_WIDTH;
-    infoPanel.height = CONFIG.PANEL_HEIGHT;
-    infoPanel.color = "#FFFFFF";
-    infoPanel.thickness = 2;
-    infoPanel.background = "rgba(0, 0, 0, 0.8)";
-    infoPanel.horizontalAlignment = Rectangle.ALIGN_RIGHT;
-    infoPanel.verticalAlignment = Rectangle.ALIGN_TOP;
-    infoPanel.left = -CONFIG.PANEL_RIGHT_OFFSET;
-    infoPanel.top = CONFIG.PANEL_TOP_OFFSET;
-    infoPanel.isVisible = true;
-    advancedTexture.addControl(infoPanel);
+  createDisks(layerData) {
+    const layerSizes = layerData.map(layer => layer.numel);
+    const logMinSize = Math.min(...layerSizes.map(Math.log));
+    const logMaxSize = Math.max(...layerSizes.map(Math.log));
+    let currentYPosition = CONFIG.STARTING_Y_POSITION;
+    let currentXPosition = 0;
+    const disks = [];
 
-    const panelText = new TextBlock();
-    panelText.text = "Hover over a layer to see details";
-    panelText.color = "white";
-    panelText.fontSize = 16;
-    panelText.textWrapping = true;
-    panelText.paddingLeft = "10px";
-    panelText.paddingRight = "10px";
-    panelText.paddingTop = "10px";
-    panelText.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
-    infoPanel.addControl(panelText);
+    layerData.forEach((layer, index) => {
+      const layerCleanName = this.getCleanLayerName(layer.name);
+      const tileSize = CONFIG.DISK_MIN_SIZE +
+        ((Math.log(layer.numel) - logMinSize) / (logMaxSize - logMinSize)) *
+        (CONFIG.DISK_MAX_SIZE - CONFIG.DISK_MIN_SIZE);
 
-    return { advancedTexture, infoPanel, panelText };
+      const material = new StandardMaterial(`material_layer_${index}`, this.scene);
+      material.diffuseColor = this.assignLayerColor(layerCleanName);
+      material.emissiveColor = material.diffuseColor.scale(CONFIG.COLOR_EMISSIVE_MULTIPLIERS);
+
+      const boxOptions = CONFIG.MODEL_DIRECTION === 'horizontal'
+        ? { width: CONFIG.DISK_THICKNESS, height: tileSize, depth: tileSize }
+        : { width: tileSize, height: CONFIG.DISK_THICKNESS, depth: tileSize };
+
+      const disk = MeshBuilder.CreateBox(`disk_layer_${index}`, boxOptions, this.scene);
+      disk.position = CONFIG.MODEL_DIRECTION === 'horizontal'
+        ? new Vector3(currentXPosition, 0, 0)
+        : new Vector3(0, currentYPosition, 0);
+
+      if (CONFIG.MODEL_DIRECTION === 'horizontal') {
+        currentXPosition += CONFIG.DISK_THICKNESS * CONFIG.DISK_SPACING_MULTIPLIER;
+      } else {
+        currentYPosition += CONFIG.DISK_THICKNESS * CONFIG.DISK_SPACING_MULTIPLIER;
+      }
+
+      disk.material = material;
+      disk.actionManager = new ActionManager(this.scene);
+      disk.actionManager.registerAction(
+        new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
+          this.panelText.text = `Name: ${layer.name}\nShape: ${JSON.stringify(layer.shape)}\nParams: ${layer.numel.toLocaleString()}`;
+        })
+      );
+      disk.actionManager.registerAction(
+        new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, () => {
+          this.panelText.text = "Hover over a layer to see details";
+        })
+      );
+
+      disks.push(disk);
+    });
+
+    const extent = CONFIG.MODEL_DIRECTION === 'horizontal' ? currentXPosition : currentYPosition;
+    const target = CONFIG.MODEL_DIRECTION === 'horizontal'
+      ? new Vector3(currentXPosition / 2, 0, 0)
+      : new Vector3(0, currentYPosition / 2, 0);
+
+    return { disks, target, extent };
   }
 
-  // Scene Management
+  renderModel(modelName) {
+    if (!this.modelData[modelName]) return;
+    this.activeDisks = this.clearScene(this.activeDisks); // Now calling instance method
+    const { disks, target, extent } = this.createDisks(this.modelData[modelName]);
+    this.activeDisks = disks;
+    this.cameraManager.updateTargetAndRadius(target, extent);
+    this.cameraManager.setMode("default");
+  }
+
+  // Add clearScene as an instance method for consistency
   clearScene(disks) {
     disks.forEach(disk => disk.dispose());
     return [];
   }
-
-  // UI Setup
-  setupUI(modelData, renderFn) {
-    const modelSelector = document.getElementById("modelSelect");
-    modelSelector.innerHTML = "";
-    Object.keys(modelData).forEach(modelName => {
-      const option = document.createElement("option");
-      option.value = modelName;
-      option.textContent = modelName;
-      modelSelector.appendChild(option);
-    });
-    modelSelector.addEventListener("change", () => renderFn(modelSelector.value));
-    if (Object.keys(modelData).length > 0) renderFn(Object.keys(modelData)[0]);
-  }
 }
-
-export { SceneManager };
