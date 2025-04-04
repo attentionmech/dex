@@ -49,7 +49,7 @@ class SceneMaker {
     advancedTexture.addControl(infoPanel);
 
     const panelText = new TextBlock();
-    panelText.text = "Hover over a layer to see details";
+    panelText.text = "loshdex";
     panelText.color = "white";
     panelText.fontSize = 16;
     panelText.textWrapping = true;
@@ -78,7 +78,7 @@ class SceneMaker {
       option.textContent = modelName;
       modelSelector.appendChild(option);
     });
-    modelSelector.addEventListener("change", () => renderFn(modelSelector.value));
+    modelSelector.addEventListener("change-model", () => renderFn(modelSelector.value));
     if (Object.keys(modelData).length > 0) renderFn(Object.keys(modelData)[0]);
   }
 }

@@ -43,7 +43,8 @@ export class SceneManager {
     return this.layerColorAssignments[layerName];
   }
 
-  createDisks(layerData) {
+  createDisks(layerData) {    
+
     const layerSizes = layerData.map(layer => layer.numel);
     const logMinSize = Math.min(...layerSizes.map(Math.log));
     const logMaxSize = Math.max(...layerSizes.map(Math.log));
@@ -79,15 +80,23 @@ export class SceneManager {
       disk.material = material;
       disk.actionManager = new ActionManager(this.scene);
       disk.actionManager.registerAction(
+
+        new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
+          this.cameraManager.updateTargetAndRadius(disk.position, CONFIG.DISK_MAX_SIZE);
+          this.cameraManager.setMode("default");
+        })
+      );
+      disk.actionManager.registerAction(
         new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
           this.panelText.text = `Name: ${layer.name}\nShape: ${JSON.stringify(layer.shape)}\nParams: ${layer.numel.toLocaleString()}`;
         })
       );
       disk.actionManager.registerAction(
         new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, () => {
-          this.panelText.text = "Hover over a layer to see details";
+          this.panelText.text = "loshdex";
         })
       );
+  
 
       disks.push(disk);
     });
