@@ -38,6 +38,6 @@ export class SceneManager {
     const { target, extent } = this.dexModelManager.create(this.modelData[modelName]);
     
     this.cameraManager.updateTargetAndRadius(target, extent);
-    this.cameraManager.setMode("default");
+    this.cameraManager.setMode("interactive");
   }
 }

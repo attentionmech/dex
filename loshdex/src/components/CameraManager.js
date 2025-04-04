@@ -15,10 +15,10 @@ export class CameraManager {
     this.camera.minZ = 1;
     this.camera.maxZ = 200000;
     this.canvas = canvas;
-    this.setMode("default"); // Initial mode
+    this.setMode("interactive"); // Initial mode
   }
 
-  setMode(mode, target = CONFIG.CAMERA_TARGET, extent = 4000) {
+  setMode(mode, target = CONFIG.CAMERA_TARGET, extent = 2000) {
     this.camera.target = target;
     switch (mode) {
       case "default":

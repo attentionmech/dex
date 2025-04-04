@@ -1,6 +1,8 @@
-import { StandardMaterial, MeshBuilder, Vector3, ActionManager, ExecuteCodeAction } from "@babylonjs/core";
+import { StandardMaterial, MeshBuilder, Vector3, ActionManager, ExecuteCodeAction, DynamicTexture, Plane, Color3, Mesh } from "@babylonjs/core";
+
 import { CONFIG } from "../commons/Configs";
 import { RAINBOW_COLORS } from "../commons/Constants";
+
 
 export class DexModelVisualizer {
   constructor(scene, uiComponents) {
@@ -12,6 +14,25 @@ export class DexModelVisualizer {
   getCleanLayerName(originalName) {
     return originalName.replace(/\.\d+\./g, ".");
   }
+
+  createLabelPlane(text, scene) {
+    const dynamicTexture = new DynamicTexture("labelTexture", { width: 1024, height: 128 }, scene, false);
+    dynamicTexture.hasAlpha = true;
+  
+    dynamicTexture.drawText(text, null, 80, "bold 100px Arial", "white", "black", true);
+  
+    const labelMaterial = new StandardMaterial("labelMaterial", scene);
+    labelMaterial.diffuseTexture = dynamicTexture;
+    labelMaterial.emissiveColor = new Color3(1, 1, 1);
+    labelMaterial.backFaceCulling = false;
+  
+    const plane = MeshBuilder.CreatePlane("labelPlane", { width: 200, height: 50 }, scene);
+    plane.material = labelMaterial;
+    plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
+  
+    return plane;
+  }
+  
 
   assignLayerColor(layerName) {
     if (!this.layerColorAssignments[layerName]) {
@@ -57,6 +78,22 @@ export class DexModelVisualizer {
       } else {
         currentYPosition += CONFIG.DISK_THICKNESS * CONFIG.DISK_SPACING_MULTIPLIER;
       }
+
+      //LABELS
+      const labelPlane = this.createLabelPlane(layerCleanName, this.scene);
+
+      // Position label above the disk
+      labelPlane.position = disk.position.clone();
+      if (CONFIG.MODEL_DIRECTION === 'horizontal') {
+        labelPlane.position.y += tileSize / 2 + 30;
+      } else {
+        labelPlane.position.y += CONFIG.DISK_THICKNESS / 2 + 30;
+      }
+
+      // Make label follow the disk
+      labelPlane.parent = disk;
+
+
 
       disk.material = material;
       disk.actionManager = new ActionManager(this.scene);
