@@ -1,6 +1,6 @@
 import { StandardMaterial, MeshBuilder, Vector3, ActionManager, ExecuteCodeAction } from "@babylonjs/core";
-import { CONFIG } from "./configs";
-import { RAINBOW_COLORS } from "./constants";
+import { CONFIG } from "../commons/Configs";
+import { RAINBOW_COLORS } from "../commons/Constants";
 
 export class ModelManager {
   constructor(scene, cameraManager, panelText) {

@@ -1,8 +1,8 @@
 import { Engine } from "@babylonjs/core";
 import "@babylonjs/loaders";
-import { CameraManager } from "./CameraManager";
-import { SceneManager } from "./SceneManager";
-import { ModelManager } from "./ModelManager";
+import { CameraManager } from "../components/CameraManager";
+import { SceneManager } from "../components/SceneManager";
+import { ModelManager } from "../components/ModelManager";
 
 class AppManager {
   constructor(canvasId) {

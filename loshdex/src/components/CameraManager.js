@@ -1,5 +1,5 @@
 import { ArcRotateCamera } from "@babylonjs/core";
-import { CONFIG } from "./configs";
+import { CONFIG } from "../commons/Configs";
 
 // CameraManager Class for predefined camera modes
 export class CameraManager {

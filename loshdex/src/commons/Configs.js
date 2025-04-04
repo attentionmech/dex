@@ -21,5 +21,5 @@ export const CONFIG = {
   PANEL_HEIGHT: "100px",
   PANEL_RIGHT_OFFSET: -40,
   PANEL_TOP_OFFSET: 40,
-  MODEL_DIRECTION: 'vertical' // Default direction, can be 'horizontal'
+  MODEL_DIRECTION: 'horizontal' // Default direction, can be 'horizontal'
 };

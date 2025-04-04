@@ -1,6 +1,6 @@
 import { Scene, HemisphericLight, Vector3, GlowLayer } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
-import { CONFIG } from "./configs";
+import { CONFIG } from "../commons/Configs";
 
 class SceneManager {
   constructor(engine) {

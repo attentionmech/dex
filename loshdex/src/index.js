@@ -1,4 +1,4 @@
-import { AppManager } from "./AppManager";
+import { AppManager } from "./app/AppManager";
 
 // Main Initialization
 function initialize() {
