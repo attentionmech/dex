@@ -20,8 +20,8 @@ export class CameraManager {
     this.dexModelVisualizer = dexModelVisualizer; // Reference to DexModelVisualizer
     this.isDragging = false;
     this.lastMouseX = null;
-    this.currentMode = "free";
-    this.setMode("free"); // Initial mode
+    this.currentMode = "default";
+    this.setMode("default"); // Initial mode
     this.setupDragHandler();
   }
 
