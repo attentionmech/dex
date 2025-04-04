@@ -1,11 +1,13 @@
 import {
   Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, MeshBuilder,
-  StandardMaterial, Color3, GlowLayer
+  StandardMaterial, Color3, GlowLayer, ActionManager, ExecuteCodeAction
 } from "@babylonjs/core";
-
+import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
 import "@babylonjs/loaders";
 
 // Configuration Parameters (Adjust these values)
+
+
 // Replace your CONFIG with this
 const CONFIG = {
   // BACKGROUND_COLOR: Defines the scene's background color using RGB values (0 to 1 range).
@@ -80,6 +82,34 @@ const CONFIG = {
 
   // STARTING_X_POSITION: Initial X-coordinate for the first disk when stacking horizontally.
   // - 0 starts at the origin; disks stack rightward if MODEL
+
+  // TOOLTIP_OFFSET_X: Horizontal offset of the tooltip from the mouse cursor in pixels.
+  // - Default 10 means it appears 10px to the right of the cursor.
+  // - Increase to move it further right, decrease (or use negative) to move it left.
+  TOOLTIP_OFFSET_X: 10,
+
+  // TOOLTIP_OFFSET_Y: Vertical offset of the tooltip from the mouse cursor in pixels.
+  // - Default 10 means it appears 10px below the cursor.
+  // - Increase to move it further down, decrease (or use negative) to move it up.
+  TOOLTIP_OFFSET_Y: 10,
+
+
+  // PANEL_WIDTH: Width of the fixed panel in pixels.
+  // - 300px is a reasonable width for displaying layer info.
+  PANEL_WIDTH: "200px",
+
+  // PANEL_HEIGHT: Height of the fixed panel in pixels.
+  // - 400px provides enough space for multiple lines of text.
+  PANEL_HEIGHT: "100px",
+
+  // PANEL_RIGHT_OFFSET: Distance from the right edge of the canvas in pixels.
+  // - 20px keeps it slightly inset from the edge.
+  PANEL_RIGHT_OFFSET: -40,
+
+  // PANEL_TOP_OFFSET: Distance from the top edge of the canvas in pixels.
+  // - 20px keeps it slightly inset from the top.
+  PANEL_TOP_OFFSET: 40,
+
 }
 // Rest of your code remains unchanged...
 
@@ -117,6 +147,13 @@ const RAINBOW_COLORS = {
   'Gray': new Color3(0.5, 0.5, 0.5)
 };
 
+// [Your existing imports remain the same, just add the GUI imports above]
+
+// [Your CONFIG and RAINBOW_COLORS remain unchanged]
+
+
+// [Your CONFIG and RAINBOW_COLORS remain unchanged, just add the new panel params above]
+
 // DOM Elements
 const renderCanvas = document.getElementById("renderCanvas");
 
@@ -124,7 +161,6 @@ const renderCanvas = document.getElementById("renderCanvas");
 const renderingEngine = new Engine(renderCanvas, true);
 const currentScene = new Scene(renderingEngine);
 currentScene.clearColor = CONFIG.BACKGROUND_COLOR;
-
 
 // Camera setup
 const mainCamera = new ArcRotateCamera(
@@ -136,29 +172,42 @@ const mainCamera = new ArcRotateCamera(
   currentScene
 );
 mainCamera.attachControl(renderCanvas, true);
+mainCamera.minZ = 1;
+mainCamera.maxZ = 200000;
 
-// Add these lines to adjust clipping planes
-mainCamera.minZ = 1;        // Near plane (default is 1, can lower if needed)
-mainCamera.maxZ = 200000;    // Far plane (default is 10000, increase for larger scenes)
-
-// Camera
-// const mainCamera = new ArcRotateCamera(
-//   "mainCamera", 
-//   CONFIG.CAMERA_ALPHA, 
-//   CONFIG.CAMERA_BETA, 
-//   CONFIG.CAMERA_RADIUS, 
-//   CONFIG.CAMERA_TARGET, 
-//   currentScene
-// );
-// mainCamera.attachControl(renderCanvas, true);
-
-// Lighting
-const upperLight = new HemisphericLight("upperLight", CONFIG.LIGHT1_POSITION, currentScene);
-const lowerLight = new HemisphericLight("lowerLight", CONFIG.LIGHT2_POSITION, currentScene);
+// Lights
+const upperLight = new HemisphericLight("upperLight", new Vector3(1000, 1000, 0), currentScene);
+const lowerLight = new HemisphericLight("lowerLight", new Vector3(-1000, -1000, 0), currentScene);
 
 // Effects
 const glowEffect = new GlowLayer("glowEffect", currentScene);
 glowEffect.intensity = CONFIG.GLOW_INTENSITY;
+
+// GUI Setup for Fixed Right Panel
+const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+const infoPanel = new Rectangle();
+infoPanel.width = CONFIG.PANEL_WIDTH;
+infoPanel.height = CONFIG.PANEL_HEIGHT;
+infoPanel.color = "#FFFFFF";
+infoPanel.thickness = 2;
+infoPanel.background = "rgba(0, 0, 0, 0.8)";
+infoPanel.horizontalAlignment = Rectangle.ALIGN_RIGHT; // Align to right side
+infoPanel.verticalAlignment = Rectangle.ALIGN_TOP;     // Align to top
+infoPanel.left = -CONFIG.PANEL_RIGHT_OFFSET;           // Offset from right edge
+infoPanel.top = CONFIG.PANEL_TOP_OFFSET;               // Offset from top
+infoPanel.isVisible = true;                            // Always visible, but content updates
+advancedTexture.addControl(infoPanel);
+
+const panelText = new TextBlock();
+panelText.text = "Hover over a layer to see details";
+panelText.color = "white";
+panelText.fontSize = 16;
+panelText.textWrapping = true;
+panelText.paddingLeft = "10px";
+panelText.paddingRight = "10px";
+panelText.paddingTop = "10px";
+panelText.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
+infoPanel.addControl(panelText);
 
 // Data
 let modelInformation = {};
@@ -194,7 +243,7 @@ function assignLayerColor(layerName) {
   return layerColorAssignments[layerName];
 }
 
-// Disk Generation
+// Disk Generation with Panel Updates
 function createModelDisks(layerData) {
   const layerSizes = layerData.map(layer => layer.numel);
   const logMinSize = Math.min(...layerSizes.map(Math.log));
@@ -207,7 +256,6 @@ function createModelDisks(layerData) {
   layerData.forEach((layer, index) => {
     const layerCleanName = getCleanLayerName(layer.name);
     
-    // Calculate tile size based on numel (square tiles)
     const tileSize = CONFIG.DISK_MIN_SIZE + 
       ((Math.log(layer.numel) - logMinSize) / (logMaxSize - logMinSize)) * 
       (CONFIG.DISK_MAX_SIZE - CONFIG.DISK_MIN_SIZE);
@@ -216,21 +264,18 @@ function createModelDisks(layerData) {
     diskMaterial.diffuseColor = assignLayerColor(layerCleanName);
     diskMaterial.emissiveColor = diskMaterial.diffuseColor.scale(CONFIG.COLOR_EMISSIVE_MULTIPLIERS);
     
-    console.log(`Layer: ${layerCleanName}, Tile Size: ${tileSize}`);
-    
-    // Define dimensions based on MODEL_DIRECTION
     let boxOptions;
     if (CONFIG.MODEL_DIRECTION === 'horizontal') {
       boxOptions = {
-        width: CONFIG.DISK_THICKNESS, // Thickness along X-axis
-        height: tileSize,             // Square dimension
-        depth: tileSize               // Square dimension
+        width: CONFIG.DISK_THICKNESS,
+        height: tileSize,
+        depth: tileSize
       };
-    } else { // vertical
+    } else {
       boxOptions = {
-        width: tileSize,              // Square dimension
-        height: CONFIG.DISK_THICKNESS,// Thickness along Y-axis
-        depth: tileSize               // Square dimension
+        width: tileSize,
+        height: CONFIG.DISK_THICKNESS,
+        depth: tileSize
       };
     }
     
@@ -240,20 +285,35 @@ function createModelDisks(layerData) {
       currentScene
     );
     
-    // Position based on MODEL_DIRECTION
     if (CONFIG.MODEL_DIRECTION === 'horizontal') {
       diskMesh.position = new Vector3(currentXPosition, 0, 0);
       currentXPosition += CONFIG.DISK_THICKNESS * CONFIG.DISK_SPACING_MULTIPLIER;
-    } else { // vertical
+    } else {
       diskMesh.position = new Vector3(0, currentYPosition, 0);
       currentYPosition += CONFIG.DISK_THICKNESS * CONFIG.DISK_SPACING_MULTIPLIER;
     }
     
     diskMesh.material = diskMaterial;
+
+    // Add Action Manager for hover events
+    diskMesh.actionManager = new ActionManager(currentScene);
+    
+    diskMesh.actionManager.registerAction(
+      new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
+        panelText.text = `Name: ${layer.name}\nShape: ${JSON.stringify(layer.shape)}\nParams: ${layer.numel.toLocaleString()}`;
+      })
+    );
+    
+    diskMesh.actionManager.registerAction(
+      new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, () => {
+        panelText.text = "Hover over a layer to see details";
+      })
+    );
+    
     diskMeshes.push(diskMesh);
   });
   
-  // Adjust camera target based on direction
+  // Adjust camera target
   if (CONFIG.MODEL_DIRECTION === 'horizontal') {
     mainCamera.target = new Vector3(currentXPosition / 2, 0, 0);
     mainCamera.radius = currentXPosition * 1.5;
