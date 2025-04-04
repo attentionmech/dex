@@ -5,117 +5,162 @@ import {
 
 import "@babylonjs/loaders";
 
-const canvas = document.getElementById("renderCanvas");
-const engine = new Engine(canvas, true);
-const scene = new Scene(engine);
-scene.clearColor = new Color3(0, 0, 0); // Pitch black background
+// Configuration Parameters (Adjust these values)
+const CONFIG = {
+  // Scene
+  BACKGROUND_COLOR: new Color3(0.1, 0.1, 0.1),  // Pitch black
+  
+  // Camera
+  CAMERA_ALPHA: Math.PI / 3,
+  CAMERA_BETA: Math.PI / 3,
+  CAMERA_RADIUS: 400,
+  CAMERA_TARGET: new Vector3(0,300,0),// how to change this
+  
+  // Lighting
+  LIGHT1_POSITION: new Vector3(1, 1, 0),
+  LIGHT2_POSITION: new Vector3(-1, -1, 0),
+  
+  // Disk Appearance
+  DISK_MIN_SIZE: 1,
+  DISK_MAX_SIZE: 4,
+  DISK_DEPTH: 20,
+  GLOW_INTENSITY: 0.3,
+  COLOR_EMISSIVE_MULTIPLIERS: 20,
+  
+  // Positioning
+  DISK_SPACING_MULTIPLIER: 1.5,
+  STARTING_Y_POSITION: 200
+};
 
-// Camera setup
-let camera = new ArcRotateCamera("Camera", Math.PI / 3, Math.PI / 3, 100, Vector3.Zero() , scene);
-camera.attachControl(canvas, true);
+// DOM Elements
+const renderCanvas = document.getElementById("renderCanvas");
+
+// Scene Setup
+const renderingEngine = new Engine(renderCanvas, true);
+const currentScene = new Scene(renderingEngine);
+currentScene.clearColor = CONFIG.BACKGROUND_COLOR;
+
+// Camera
+const mainCamera = new ArcRotateCamera(
+  "mainCamera", 
+  CONFIG.CAMERA_ALPHA, 
+  CONFIG.CAMERA_BETA, 
+  CONFIG.CAMERA_RADIUS, 
+  CONFIG.CAMERA_TARGET, 
+  currentScene
+);
+mainCamera.attachControl(renderCanvas, true);
 
 // Lighting
-const light1 = new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
-const light2 = new HemisphericLight("light2", new Vector3(-1, -1, 0), scene);
+const upperLight = new HemisphericLight("upperLight", CONFIG.LIGHT1_POSITION, currentScene);
+const lowerLight = new HemisphericLight("lowerLight", CONFIG.LIGHT2_POSITION, currentScene);
 
-// Glow effect
-const glow = new GlowLayer("glow", scene);
-glow.intensity = 0.8; // Adjust for stronger glow
+// Effects
+const glowEffect = new GlowLayer("glowEffect", currentScene);
+glowEffect.intensity = CONFIG.GLOW_INTENSITY;
 
-// Adjustable gap
-let gapMultiplier = 2.2; // You can change this value to control spacing
+// Data
+let modelInformation = {};
 
-// Fetch model data
-let modelData = {};
-async function loadModelData() {
+// Load model data
+async function loadModelInformation() {
   try {
     const response = await fetch("/model_info.json");
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    modelData = await response.json();
-    console.log("Loaded model data:", modelData);
-    setupUI();
+    modelInformation = await response.json();
+    console.log("Loaded model information:", modelInformation);
+    initializeUserInterface();
   } catch (error) {
     console.error("Error loading JSON:", error);
   }
 }
 
-// Extract clean layer name and assign unique colors
-function cleanLayerName(name) {
-  return name.replace(/\.\d+\./g, ".");
+// Color Management
+const layerColorAssignments = {};
+function getCleanLayerName(originalName) {
+  return originalName.replace(/\.\d+\./g, ".");
 }
 
-const layerColorMap = {};
-function getLayerColor(name) {
-  if (!layerColorMap[name]) {
-    const hue = Object.keys(layerColorMap).length * 40 % 360; // Cycle through hues
-    layerColorMap[name] = Color3.FromHSV(hue / 360, hue/180, hue/90); // Fully saturated and bright
+function assignLayerColor(layerName) {
+  if (!layerColorAssignments[layerName]) {
+    const colorCount = Object.keys(layerColorAssignments).length;
+    const hue = colorCount * 40 % 360;
+    layerColorAssignments[layerName] = Color3.FromHSV(hue / 360, hue/180, hue/90);
   }
-  return layerColorMap[name];
+  return layerColorAssignments[layerName];
 }
 
-// Generate Model Disks
-function generateModelDisks(layers) {
-  const sizes = layers.map(l => l.numel);
-  const minSize = 1, maxSize = 4;
-  const min = Math.min(...sizes.map(Math.log));
-  const max = Math.max(...sizes.map(Math.log));
-
-  let z = 0;
-  let meshes = [];
+// Disk Generation
+function createModelDisks(layerData) {
+  const layerSizes = layerData.map(layer => layer.numel);
+  const logMinSize = Math.min(...layerSizes.map(Math.log));
+  const logMaxSize = Math.max(...layerSizes.map(Math.log));
   
-  layers.forEach((layer, i) => {
-    const cleanName = cleanLayerName(layer.name);
-    const size = minSize + ((Math.log(layer.numel) - min) / (max - min)) * (maxSize - minSize);
+  let currentYPosition = CONFIG.STARTING_Y_POSITION;
+  const diskMeshes = [];
+  
+  layerData.forEach((layer, index) => {
+    const layerCleanName = getCleanLayerName(layer.name);
+    const diskSize = CONFIG.DISK_MIN_SIZE + 
+      ((Math.log(layer.numel) - logMinSize) / (logMaxSize - logMinSize)) * 
+      (CONFIG.DISK_MAX_SIZE - CONFIG.DISK_MIN_SIZE);
     
-    const mat = new StandardMaterial(`mat_${i}`, scene);
-    mat.diffuseColor = getLayerColor(cleanName);
-    mat.emissiveColor = mat.diffuseColor.scale(1.5); // Make cubes glow
-    console.log(`Layer: ${cleanName}, Color:`, mat.diffuseColor);
+    const diskMaterial = new StandardMaterial(`material_layer_${index}`, currentScene);
+    diskMaterial.diffuseColor = assignLayerColor(layerCleanName);
+    diskMaterial.emissiveColor = diskMaterial.diffuseColor.scale(CONFIG.COLOR_EMISSIVE_MULTIPLIERS);
     
-    const disk = MeshBuilder.CreateBox(`disk_${i}`, { width: size, height: size, depth: 4 }, scene); // Thin depth
-    disk.position = new Vector3(0, z, 0);
-    disk.material = mat;
-    meshes.push(disk);
+    console.log(`Layer: ${layerCleanName}, Color:`, diskMaterial.diffuseColor);
     
-    z += size * gapMultiplier; // Controlled gap
+    const diskMesh = MeshBuilder.CreateBox(
+      `disk_layer_${index}`, 
+      { width: diskSize, height: diskSize, depth: CONFIG.DISK_DEPTH }, 
+      currentScene
+    );
+    
+    // Position control - only changes Y coordinate
+    diskMesh.position = new Vector3(0, currentYPosition, 0);
+    diskMesh.material = diskMaterial;
+    diskMeshes.push(diskMesh);
+    
+    currentYPosition += diskSize * CONFIG.DISK_SPACING_MULTIPLIER;
   });
   
-  return meshes;
+  return diskMeshes;
 }
 
-// Scene management
-let currentMeshes = [];
-function clearScene() {
-  currentMeshes.forEach(m => m.dispose());
-  currentMeshes = [];
+// Scene Management
+let activeDiskMeshes = [];
+function clearCurrentScene() {
+  activeDiskMeshes.forEach(mesh => mesh.dispose());
+  activeDiskMeshes = [];
 }
 
-function renderModel(name) {
-  if (!modelData[name]) return;
-  clearScene();
-  currentMeshes = generateModelDisks(modelData[name]);
+function renderModelVisualization(modelName) {
+  if (!modelInformation[modelName]) return;
+  clearCurrentScene();
+  activeDiskMeshes = createModelDisks(modelInformation[modelName]);
 }
 
-// UI Setup
-function setupUI() {
-  const modelSelect = document.getElementById("modelSelect");
-  modelSelect.innerHTML = "";
+// UI
+function initializeUserInterface() {
+  const modelSelector = document.getElementById("modelSelect");
+  modelSelector.innerHTML = "";
 
-  Object.keys(modelData).forEach(name => {
-    const opt = document.createElement("option");
-    opt.value = name;
-    opt.textContent = name;
-    modelSelect.appendChild(opt);
+  Object.keys(modelInformation).forEach(modelName => {
+    const option = document.createElement("option");
+    option.value = modelName;
+    option.textContent = modelName;
+    modelSelector.appendChild(option);
   });
 
-  modelSelect.addEventListener("change", () => renderModel(modelSelect.value));
+  modelSelector.addEventListener("change", () => renderModelVisualization(modelSelector.value));
 
-  if (Object.keys(modelData).length > 0) {
-    renderModel(Object.keys(modelData)[0]);
+  if (Object.keys(modelInformation).length > 0) {
+    renderModelVisualization(Object.keys(modelInformation)[0]);
   }
 }
 
-// Initialize everything
-loadModelData();
-engine.runRenderLoop(() => scene.render());
-window.addEventListener("resize", () => engine.resize());
+// Initialization
+loadModelInformation();
+renderingEngine.runRenderLoop(() => currentScene.render());
+window.addEventListener("resize", () => renderingEngine.resize());
