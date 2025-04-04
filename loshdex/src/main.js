@@ -20,7 +20,9 @@ const CONFIG = {
   GLOW_INTENSITY: 0.3,
   COLOR_EMISSIVE_MULTIPLIERS: 20,
   DISK_SPACING_MULTIPLIER: 1.5,
-  STARTING_Y_POSITION: 200
+  STARTING_Y_POSITION: 200,
+  STARTING_X_POSITION: -200, // Added for horizontal orientation
+  MODEL_DIRECTION: 'horizontal' // 'horizontal' or 'vertical'
 };
 
 // Predefined list of 30 distinct rainbow colors
@@ -111,7 +113,6 @@ function assignLayerColor(layerName) {
     const colorNames = Object.keys(RAINBOW_COLORS);
     const colorCount = Object.keys(layerColorAssignments).length;
     
-    // If we've used all colors except Gray, use Gray; otherwise use next color
     layerColorAssignments[layerName] = 
       colorCount >= colorNames.length - 1 
         ? RAINBOW_COLORS['Gray']
@@ -127,6 +128,7 @@ function createModelDisks(layerData) {
   const logMaxSize = Math.max(...layerSizes.map(Math.log));
   
   let currentYPosition = CONFIG.STARTING_Y_POSITION;
+  let currentXPosition = CONFIG.STARTING_X_POSITION;
   const diskMeshes = [];
   
   layerData.forEach((layer, index) => {
@@ -147,12 +149,25 @@ function createModelDisks(layerData) {
       currentScene
     );
     
-    diskMesh.position = new Vector3(0, currentYPosition, 0);
+    // Position based on MODEL_DIRECTION
+    if (CONFIG.MODEL_DIRECTION === 'horizontal') {
+      diskMesh.position = new Vector3(currentXPosition, 0, 0);
+      currentXPosition += diskSize * CONFIG.DISK_SPACING_MULTIPLIER;
+    } else { // vertical
+      diskMesh.position = new Vector3(0, currentYPosition, 0);
+      currentYPosition += diskSize * CONFIG.DISK_SPACING_MULTIPLIER;
+    }
+    
     diskMesh.material = diskMaterial;
     diskMeshes.push(diskMesh);
-    
-    currentYPosition += diskSize * CONFIG.DISK_SPACING_MULTIPLIER;
   });
+  
+  // Adjust camera target based on direction
+  if (CONFIG.MODEL_DIRECTION === 'horizontal') {
+    mainCamera.target = new Vector3(currentXPosition / 2, 0, 0);
+  } else {
+    mainCamera.target = new Vector3(0, currentYPosition / 2, 0);
+  }
   
   return diskMeshes;
 }
