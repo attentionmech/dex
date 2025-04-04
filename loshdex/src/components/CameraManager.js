@@ -1,9 +1,8 @@
-import { ArcRotateCamera } from "@babylonjs/core";
+import { ArcRotateCamera, Vector3 } from "@babylonjs/core";
 import { CONFIG } from "../commons/Configs";
 
-// CameraManager Class for predefined camera modes
 export class CameraManager {
-  constructor(scene, canvas) {
+  constructor(scene, canvas, dexModelVisualizer) {
     this.camera = new ArcRotateCamera(
       "mainCamera",
       CONFIG.CAMERA_ALPHA,
@@ -15,10 +14,17 @@ export class CameraManager {
     this.camera.minZ = 1;
     this.camera.maxZ = 200000;
     this.canvas = canvas;
+    this.scene = scene;
+    this.dexModelVisualizer = dexModelVisualizer; // Reference to DexModelVisualizer
+    this.isDragging = false;
+    this.lastMouseX = null;
+    this.currentMode = "interactive";
     this.setMode("interactive"); // Initial mode
+    this.setupDragHandler();
   }
 
   setMode(mode, target = CONFIG.CAMERA_TARGET, extent = 1600) {
+    this.currentMode = mode;
     this.camera.target = target;
     switch (mode) {
       case "default":
@@ -53,5 +59,35 @@ export class CameraManager {
   updateTargetAndRadius(target, extent) {
     this.camera.target = target;
     this.camera.radius = extent * 1.5;
+  }
+
+  setupDragHandler() {
+    this.scene.onPointerDown = (evt) => {
+      if (this.currentMode !== "interactive" && evt.button === 0) { // Left mouse button
+        this.isDragging = true;
+        this.lastMouseX = evt.clientX;
+      }
+    };
+
+    this.scene.onPointerMove = (evt) => {
+      if (this.isDragging && this.currentMode !== "interactive") {
+        const currentMouseX = evt.clientX;
+        const deltaX = currentMouseX - this.lastMouseX;
+        this.moveModel(deltaX);
+        this.lastMouseX = currentMouseX;
+      }
+    };
+
+    this.scene.onPointerUp = () => {
+      this.isDragging = false;
+      this.lastMouseX = null;
+    };
+  }
+
+  moveModel(deltaX) {
+    const direction = CONFIG.MODEL_DIRECTION.clone().normalize();
+    const moveSpeed = 5; // Adjust this sensitivity as needed
+    const displacement = direction.scale(deltaX * moveSpeed);
+    this.dexModelVisualizer.moveModelRoot(displacement);
   }
 }

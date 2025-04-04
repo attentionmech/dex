@@ -206,5 +206,10 @@ export class DexModelVisualizer {
     this.scene.beginAnimation(this.modelRoot, 0, 30, false);
   }
   
+  moveModelRoot(displacement) {
+    const newPosition = this.modelRoot.position.clone().add(displacement);
+    this.modelRoot.position = newPosition;
+  }
+
 
 }

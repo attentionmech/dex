@@ -1,7 +1,7 @@
 import { DexModelVisualizer } from './DexModelVisualiser.js';
 
 export class DexModelManager {
-  constructor(scene, uiComponents) {
+  constructor(scene, uiComponents, dexModelVisualizer) {
 
     // ui components for the scene for model
     this.activeDisks = [];

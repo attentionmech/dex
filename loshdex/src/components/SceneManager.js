@@ -5,12 +5,12 @@ import { DexModelManager } from "./DexModelManager";
 
 // Updated SceneManager class
 export class SceneManager {
-  constructor(scene, cameraManager, uiComponents) {
+  constructor(scene, cameraManager, uiComponents, dexModelVisualizer) {
     this.scene = scene;
     this.cameraManager = cameraManager;
 
     this.uiComponents = uiComponents;
-    this.dexModelManager = new DexModelManager(scene, uiComponents); // Create Model instance
+    this.dexModelManager = new DexModelManager(scene, uiComponents, dexModelVisualizer); // Create Model instance
     
     this.modelData = {};
   }

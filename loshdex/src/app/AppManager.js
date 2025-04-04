@@ -3,17 +3,20 @@ import "@babylonjs/loaders";
 import { CameraManager } from "../components/CameraManager";
 import {  UIMaker } from "../components/UIMaker";
 import { SceneManager } from "../components/SceneManager";
+import { DexModelVisualizer } from "../components/DexModelVisualiser";
 
 class AppManager {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.engine = new Engine(this.canvas, true);
     this.uiMaker = new UIMaker(this.engine);
-    this.cameraManager = new CameraManager(this.uiMaker.scene, this.canvas);
+    this.dexModelVisualizer = new DexModelVisualizer(this.uiMaker.scene, this.uiMaker.uiComponents); // Create here
+    this.cameraManager = new CameraManager(this.uiMaker.scene, this.canvas,this.dexModelVisualizer);
     this.sceneManager = new SceneManager(
       this.uiMaker.scene,
       this.cameraManager,
-      this.uiMaker.uiComponents // for hooks
+      this.uiMaker.uiComponents, // for hooks
+      this.dexModelVisualizer
     );
   }
 
