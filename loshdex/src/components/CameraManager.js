@@ -18,7 +18,7 @@ export class CameraManager {
     this.setMode("interactive"); // Initial mode
   }
 
-  setMode(mode, target = CONFIG.CAMERA_TARGET, extent = 2000) {
+  setMode(mode, target = CONFIG.CAMERA_TARGET, extent = 1600) {
     this.camera.target = target;
     switch (mode) {
       case "default":

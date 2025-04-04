@@ -1,5 +1,7 @@
 import { StandardMaterial, MeshBuilder, Vector3, ActionManager, ExecuteCodeAction, DynamicTexture, Plane, Color3, Mesh } from "@babylonjs/core";
 
+import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
+
 import { CONFIG } from "../commons/Configs";
 import { RAINBOW_COLORS } from "../commons/Constants";
 
@@ -25,10 +27,17 @@ export class DexModelVisualizer {
     labelMaterial.diffuseTexture = dynamicTexture;
     labelMaterial.emissiveColor = new Color3(1, 1, 1);
     labelMaterial.backFaceCulling = false;
+    labelMaterial.alpha = 0.8; // Adjust alpha value for transparency
+
   
     const plane = MeshBuilder.CreatePlane("labelPlane", { width: 200, height: 50 }, scene);
     plane.material = labelMaterial;
     plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
+    plane.renderingGroupId = 2; // Adjust to a higher value for rendering above other objects
+
+    // const glowLayer = new GlowLayer("glow", this.scene);
+    // glowLayer.addExcludedMesh(plane);
+
   
     return plane;
   }
