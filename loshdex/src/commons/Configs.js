@@ -22,5 +22,6 @@ export const CONFIG = {
   PANEL_RIGHT_OFFSET: -40,
   PANEL_TOP_OFFSET: 40,
   START_POSITION: new Vector3(0, 0, 0), // Default starting position as Vector3 (x, y, z)
-  MODEL_DIRECTION: new Vector3(1,0, 0)  // Default direction as Vector3 (x-axis)};
+  MODEL_DIRECTION: new Vector3(1,0, 0),  // Default direction as Vector3 (x-axis)};
+  MOVE_SPEED: 5
 }

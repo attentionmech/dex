@@ -95,7 +95,7 @@ export class CameraManager {
   moveModel(deltaX) {
     
     const direction = CONFIG.MODEL_DIRECTION.clone().normalize();
-    const moveSpeed = 100; // Adjust this sensitivity as needed
+    const moveSpeed = CONFIG.MOVE_SPEED; // Adjust this sensitivity as needed
     const displacement = direction.scale(deltaX * moveSpeed);
     this.dexModelVisualizer.moveModelRoot(displacement);
   }

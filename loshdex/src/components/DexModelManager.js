@@ -5,7 +5,7 @@ export class DexModelManager {
 
     // ui components for the scene for model
     this.activeDisks = [];
-    this.dexModelVisualizer = new DexModelVisualizer(scene, uiComponents);
+    this.dexModelVisualizer = dexModelVisualizer;
   }
 
   clear(){

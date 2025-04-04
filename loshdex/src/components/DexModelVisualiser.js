@@ -174,43 +174,15 @@ export class DexModelVisualizer {
   
   
   
-  // unused
-  focusOnDisk(disk) {
-    const targetPosition = disk.getAbsolutePosition().negate(); // Reverse it to bring to (0,0,0)
-  
-    // Only move along X or Y depending on model direction
-    const current = this.modelRoot.position.clone();
-    const target = current.clone();
-  
-    if (CONFIG.MODEL_DIRECTION === "horizontal") {
-      target.x = targetPosition.x;
-    } else {
-      target.y = targetPosition.y;
-    }
-  
-    const animation = new Animation(
-      "modelShift",
-      "position",
-      60,
-      Animation.ANIMATIONTYPE_VECTOR3,
-      Animation.ANIMATIONLOOPMODE_CONSTANT
-    );
-  
-    animation.setKeys([
-      { frame: 0, value: current },
-      { frame: 15, value: target }
-    ]);
-  
-    this.modelRoot.animations = [];
-    this.modelRoot.animations.push(animation);
-    this.scene.beginAnimation(this.modelRoot, 0, 30, false);
-  }
-  
   moveModelRoot(displacement) {
-    const newPosition = this.modelRoot.position.clone().add(displacement);
-    this.modelRoot.position = newPosition;
-   
-  }
+    this.modelRoot.position.addInPlace(displacement);
 
+    this.disks.forEach(disk => {
+      disk.position = disk.position.add(displacement);
+    }
+    );
+
+    console.log("Moved model root to:", this.modelRoot.position);
+  }
 
 }
