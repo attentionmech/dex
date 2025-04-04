@@ -4,36 +4,74 @@
   <meta charset="UTF-8">
   <title>LLM Visualizer</title>
   <style>
-    body { margin: 0; display: flex; height: 100vh; font-family: sans-serif; }
-    #panel {
-      width: 280px;
-      padding: 1em;
-      background: #f7f7f7;
-      border-right: 1px solid #ccc;
-      display: flex;
-      flex-direction: column;
-      gap: 1em;
+    body { 
+      margin: 0; 
+      display: flex; 
+      height: 100vh; 
+      font-family: sans-serif; 
+      position: relative;
     }
     #renderCanvas {
-      flex: 1;
       display: block;
       width: 100%;
       height: 100%;
     }
-    select, input {
-      width: 100%;
-      padding: 0.3em;
+    #controls {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 15px; /* Increased gap for better spacing */
+    }
+    #modelSelect {
+      width: 280px;
+      padding: 0.5em; /* Increased padding for better appearance */
+      border: 1px solid #ccc; /* Added border for definition */
+      border-radius: 5px; /* Rounded corners */
+    }
+    button {
+      padding: 0.5em 1.2em; /* Adjusted padding for better proportions */
+      font-size: 1em;
+      border: none;
+      border-radius: 5px; /* Rounded corners */
+      background-color: #f0f0f0; /* Light gray background */
+      cursor: pointer;
+      transition: background-color 0.3s ease; /* Smooth hover transition */
+    }
+    button:hover {
+      background-color: #e0e0e0; /* Darker gray on hover */
     }
   </style>
 </head>
 <body>
-  <div id="panel">
-    <label>Model
-      <select id="modelSelect"></select>
-    </label>
-    
-  </div>
   <canvas id="renderCanvas"></canvas>
-  <script type="module" src="src/main.js"></script>
+  <div id="controls">
+    <button id="prevBtn">◀</button>
+    <select id="modelSelect"></select>
+    <button id="nextBtn">▶</button>
+  </div>
+  <script type="module">
+    import './src/main.js';
+
+    // Add button functionality
+    const select = document.getElementById('modelSelect');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    prevBtn.addEventListener('click', () => {
+      if (select.selectedIndex > 0) {
+        select.selectedIndex--;
+        select.dispatchEvent(new Event('change'));
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (select.selectedIndex < select.options.length - 1) {
+        select.selectedIndex++;
+        select.dispatchEvent(new Event('change'));
+      }
+    });
+  </script>
 </body>
 </html>
