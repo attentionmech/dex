@@ -115,7 +115,7 @@ export class SceneManager {
     const { disks, target, extent } = this.createDisks(this.modelData[modelName]);
     this.activeDisks = disks;
     this.cameraManager.updateTargetAndRadius(target, extent);
-    this.cameraManager.setMode("top");
+    this.cameraManager.setMode("default");
   }
 
   // Add clearScene as an instance method for consistency
