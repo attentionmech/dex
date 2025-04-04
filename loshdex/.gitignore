@@ -25,4 +25,4 @@ dist-ssr
 
 **/*/.DS_Store
 
-**/*/model_info.json
+# **/*/model_info.json
