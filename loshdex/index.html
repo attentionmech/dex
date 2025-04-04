@@ -32,6 +32,13 @@
       border: 1px solid #ccc; /* Added border for definition */
       border-radius: 5px; /* Rounded corners */
     }
+
+    #cameraSelect {
+      width: 280px;
+      padding: 0.5em; /* Increased padding for better appearance */
+      border: 1px solid #ccc; /* Added border for definition */
+      border-radius: 5px; /* Rounded corners */
+    }
     button {
       padding: 0.5em 1.2em; /* Adjusted padding for better proportions */
       font-size: 1em;
@@ -41,6 +48,7 @@
       cursor: pointer;
       transition: background-color 0.3s ease; /* Smooth hover transition */
     }
+
     button:hover {
       background-color: #e0e0e0; /* Darker gray on hover */
     }
@@ -67,15 +75,28 @@
 </head>
 <body>
   <canvas id="renderCanvas"></canvas>
-  <div id="controls">
-    <button id="prevBtn">◀</button>
-    <select id="modelSelect"></select>
-    <button id="nextBtn">▶</button>
-  </div>
-  <div id="author">
-    loshdex by <a href="https://x.com/attentionmech" target="_blank">@attentionmech</a>
+  
+  <div id="controls" style="display: flex; flex-direction: column; gap: 10px;">
+    <div >
+    <button id="prevBtn">◀</button>   
+        <select id="modelSelect"></select>
+      <button id="nextBtn">▶</button>
+    </div>
+    <div>
+      <select id="cameraSelect">
+        <option value="default">Default</option>
+        <option value="top">Top</option>
+        
+        <option value="side">Side</option>
+        <option value="interactive">Interactive</option>
+      </select>
   </div>
   
+
+  <!-- <div id="author">
+    loshdex by <a href="https://x.com/attentionmech" target="_blank">@attentionmech</a>
+  </div>
+   -->
   <script type="module">
     import './src/index.js';
 
@@ -87,16 +108,29 @@
     prevBtn.addEventListener('click', () => {
       if (select.selectedIndex > 0) {
         select.selectedIndex--;
-        select.dispatchEvent(new Event('change'));
+        select.dispatchEvent(new Event('change-model'));
       }
     });
 
     nextBtn.addEventListener('click', () => {
       if (select.selectedIndex < select.options.length - 1) {
         select.selectedIndex++;
-        select.dispatchEvent(new Event('change'));
+        select.dispatchEvent(new Event('change-model'));
       }
     });
+
+    // this is another button now
+    
+    const cameraSelect = document.getElementById('cameraSelect');
+
+    cameraSelect.addEventListener('change', () => {
+      cameraSelect.dispatchEvent(new CustomEvent('change-camera', {
+        detail: cameraSelect.value
+      }));
+    });
+
+
+
   </script>
 </body>
 </html>

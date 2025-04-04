@@ -79,13 +79,13 @@ export class SceneManager {
 
       disk.material = material;
       disk.actionManager = new ActionManager(this.scene);
-      disk.actionManager.registerAction(
+      // disk.actionManager.registerAction(
 
-        new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
-          this.cameraManager.updateTargetAndRadius(disk.position, CONFIG.DISK_MAX_SIZE);
-          this.cameraManager.setMode("default");
-        })
-      );
+      //   new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
+      //     this.cameraManager.updateTargetAndRadius(disk.position, CONFIG.DISK_MAX_SIZE);
+      //     this.cameraManager.setMode("default");
+      //   })
+      // );
       disk.actionManager.registerAction(
         new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
           this.panelText.text = `Name: ${layer.name}\nShape: ${JSON.stringify(layer.shape)}\nParams: ${layer.numel.toLocaleString()}`;
@@ -115,7 +115,7 @@ export class SceneManager {
     const { disks, target, extent } = this.createDisks(this.modelData[modelName]);
     this.activeDisks = disks;
     this.cameraManager.updateTargetAndRadius(target, extent);
-    this.cameraManager.setMode("default");
+    this.cameraManager.setMode("top");
   }
 
   // Add clearScene as an instance method for consistency

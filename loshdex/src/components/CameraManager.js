@@ -24,7 +24,7 @@ export class CameraManager {
       case "default":
         this.camera.alpha = CONFIG.CAMERA_ALPHA;
         this.camera.beta = CONFIG.CAMERA_BETA;
-        this.camera.radius = extent * 1.5;
+        this.camera.radius = extent * 3;
         this.camera.detachControl();
         break;
       case "side":
