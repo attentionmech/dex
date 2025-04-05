@@ -20,7 +20,7 @@ export const CONFIG = {
   TOOLTIP_OFFSET_X: 10,
   TOOLTIP_OFFSET_Y: 10,
   PANEL_WIDTH: "400px",
-  PANEL_HEIGHT: "150px",
+  PANEL_HEIGHT: "600px",
   PANEL_RIGHT_OFFSET: -40,
   PANEL_TOP_OFFSET: 40,
   START_POSITION: new Vector3(0, 0, 0), // Default starting position as Vector3 (x, y, z)
