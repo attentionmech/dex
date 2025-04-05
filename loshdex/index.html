@@ -90,6 +90,26 @@
     #author a:hover {
       text-decoration: underline;
     }
+    #twitterLink {
+      position: absolute;
+      bottom: 10px;
+      left: 20px;
+      background-color: #1DA1F2;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-size: 0.85em;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      transition: background-color 0.3s ease;
+      z-index: 1000;
+    }
+    
+    #twitterLink:hover {
+      background-color: #0d8ddb;
+    }
+    
   </style>
 </head>
 
@@ -116,6 +136,9 @@
   <div id="author">
     loshdex by <a href="https://x.com/attentionmech" target="_blank">@attentionmech</a>
   </div>
+
+  <a href="https://x.com/attentionmech" target="_blank" id="twitterLink">@attentionmech</a>
+
 
   <script type="module">
     import './src/index.js';
