@@ -40,7 +40,15 @@ export class DexModelVisualizer {
     return this.layerColorAssignments[layerName];
   }
 
-  createDisks(layerData) {
+  createDisks(modelData) {
+
+    console.log(modelData);
+    const layerData = modelData.modelLayerData;
+    const configData = modelData.modelConfigData;
+
+    console.log("modelData", modelData);
+    
+
     const layerSizes = layerData.map(layer => layer.numel);
     const ff = Math.log;
 

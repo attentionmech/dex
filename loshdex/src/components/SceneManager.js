@@ -9,8 +9,9 @@ export class SceneManager {
     this.uiComponents = uiComponents;
     this.dexModelManager = new DexModelManager(scene, uiComponents, dexModelVisualizer);
 
-    this.modelData = {};
+    this.modelLayerData = {};
     this.modelConfigData = {}; // New variable for JSONL config data
+    this.modelData = {}; // New variable for model data
   }
 
   async loadModelData() {
@@ -24,13 +25,16 @@ export class SceneManager {
       this.parseConfigJSONL(jsonlText);
 
 
-      console.log("modeldata", this.modelData);
-      console.log("modelconfigdata", this.modelConfigData);
+      // console.log("modeldata", this.modelLayerData);
+      // console.log("modelconfigdata", this.modelConfigData);
 
-      return { modelData: this.modelData, modelConfigData: this.modelConfigData };
+      const modelData = {"modelLayerData": this.modelLayerData, "modelConfigData": this.modelConfigData};
+      this.modelData = modelData;
+
+      return modelData ;
     } catch (error) {
       console.error("Error loading model data:", error);
-      this.modelData = {};
+      this.modelLayerData = {};
       this.modelConfigData = {};
       return { modelData: {}, modelConfigData: {} };
     }
@@ -52,7 +56,7 @@ export class SceneManager {
 
     rows.sort((a, b) => Number(a.id) - Number(b.id));
 
-    this.modelData = rows.reduce((acc, row) => {
+    this.modelLayerData = rows.reduce((acc, row) => {
       if (!row.model_name) {
         console.error("Row does not contain model_name:", row);
         return acc;
@@ -90,11 +94,15 @@ export class SceneManager {
   }
 
   renderModel(modelName) {
-    if (!this.modelData[modelName]) return;
+    if (!this.modelLayerData[modelName]) return;
 
     this.dexModelManager.clear();
 
-    const { target, extent } = this.dexModelManager.create(this.modelData[modelName]);
+    console.log("Rendering model:", modelName);
+    const { target, extent } = this.dexModelManager.create({
+      modelLayerData: this.modelLayerData[modelName],
+      modelConfigData: this.modelConfigData[modelName],
+    });
 
     this.cameraManager.updateTargetAndRadius(target, extent);
     this.cameraManager.setMode("default");

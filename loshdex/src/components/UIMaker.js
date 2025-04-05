@@ -72,7 +72,8 @@ class UIMaker {
   setupUI(modelData, renderFn) {
     const modelSelector = document.getElementById("modelSelect");
     modelSelector.innerHTML = "";
-    Object.keys(modelData).forEach(modelName => {
+    console.log("modelData", modelData.modelLayerData);
+    Object.keys(modelData.modelLayerData).forEach(modelName => {
       const option = document.createElement("option");
       option.value = modelName;
       option.textContent = modelName;
