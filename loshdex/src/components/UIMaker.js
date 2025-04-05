@@ -39,8 +39,8 @@ class UIMaker {
     infoPanel.width = CONFIG.PANEL_WIDTH;
     infoPanel.height = CONFIG.PANEL_HEIGHT;
     infoPanel.color = "#FFFFFF";
-    infoPanel.thickness = 2;
-    infoPanel.background = "rgba(0, 0, 0, 0.8)";
+    infoPanel.thickness = 0;
+    infoPanel.background = "rgba(0, 0, 0, 0.5)";
     infoPanel.horizontalAlignment = Rectangle.ALIGN_RIGHT;
     infoPanel.verticalAlignment = Rectangle.ALIGN_TOP;
     infoPanel.left = -CONFIG.PANEL_RIGHT_OFFSET;
