@@ -81,11 +81,25 @@ export class DexModelVisualizer {
       disk.actionManager.registerAction(
         new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
           this.uiComponents.panelText.text = `Name: ${layer.name}\nShape: ${JSON.stringify(layer.shape)}\nParams: ${layer.numel.toLocaleString()}`;
+
+          if (disk.material) {
+            disk.material.emissiveColor = new Color3(1, 1, 1); // bright white glow effect
+          }
+
+          disk.scaling = new Vector3(1.3, 1.3, 1.3); // scale up by 20%
+
         })
       );
       disk.actionManager.registerAction(
         new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, () => {
           this.uiComponents.panelText.text = "loshdex";
+
+          if (disk.material) {
+            disk.material.emissiveColor = disk.material.diffuseColor.scale(CONFIG.COLOR_EMISSIVE_MULTIPLIERS);
+          }
+
+          disk.scaling = new Vector3(1, 1, 1); // scale up by 20%
+
         })
       );
       
@@ -111,6 +125,7 @@ export class DexModelVisualizer {
           mat.alpha = 1;
           mat.emissiveColor = mat.diffuseColor.scale(CONFIG.COLOR_EMISSIVE_MULTIPLIERS);
         }
+
       });
     };
     
