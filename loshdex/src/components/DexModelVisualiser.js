@@ -166,7 +166,10 @@ export class DexModelVisualizer {
       const offset = right.scale(offsetX).add(up.scale(offsetY));
       
       // Create disk for this component
-      const diskPos = basePosition.clone().add(offset);
+      // Minor Z-stacking to avoid perfect overlaps
+      const separationOffset = direction.scale(idx * CONFIG.LAYER_MINOR_OFFSET || 0.01); // tiny step per disk
+      const diskPos = basePosition.clone().add(offset).add(separationOffset);
+
       
       // Determine box dimensions based on direction
       const absDir = new Vector3(
