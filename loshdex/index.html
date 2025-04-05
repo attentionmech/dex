@@ -1,56 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>loshdex</title>
   <style>
-    body { 
-      margin: 0; 
-      display: flex; 
-      height: 100vh; 
-      font-family: sans-serif; 
+    body {
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      font-family: sans-serif;
       position: relative;
     }
+
     #renderCanvas {
       display: block;
       width: 100%;
       height: 100%;
     }
+
     #controls {
       position: absolute;
-      top: 20px; /* From bottom to top */
-      left: 20px; /* Align to the right */
-      left: auto; /* Remove left alignment */
-      transform: none; /* Remove centering transform */
+      top: 20px;
+      /* From bottom to top */
+      left: 20px;
+      /* Align to the right */
+      left: auto;
+      /* Remove left alignment */
+      transform: none;
+      /* Remove centering transform */
       display: flex;
       gap: 15px;
     }
-    
+
     #modelSelect {
       width: 280px;
-      padding: 0.5em; /* Increased padding for better appearance */
-      border: 1px solid #ccc; /* Added border for definition */
-      border-radius: 5px; /* Rounded corners */
+      padding: 0.5em;
+      /* Increased padding for better appearance */
+      border: 1px solid #ccc;
+      /* Added border for definition */
+      border-radius: 5px;
+      /* Rounded corners */
     }
 
     #cameraSelect {
       width: 280px;
-      padding: 0.5em; /* Increased padding for better appearance */
-      border: 1px solid #ccc; /* Added border for definition */
-      border-radius: 5px; /* Rounded corners */
+      padding: 0.5em;
+      /* Increased padding for better appearance */
+      border: 1px solid #ccc;
+      /* Added border for definition */
+      border-radius: 5px;
+      /* Rounded corners */
     }
+
     button {
-      padding: 0.5em 1.2em; /* Adjusted padding for better proportions */
+      padding: 0.5em 1.2em;
+      /* Adjusted padding for better proportions */
       font-size: 1em;
       border: none;
-      border-radius: 5px; /* Rounded corners */
-      background-color: #f0f0f0; /* Light gray background */
+      border-radius: 5px;
+      /* Rounded corners */
+      background-color: #f0f0f0;
+      /* Light gray background */
       cursor: pointer;
-      transition: background-color 0.3s ease; /* Smooth hover transition */
+      transition: background-color 0.3s ease;
+      /* Smooth hover transition */
     }
 
     button:hover {
-      background-color: #e0e0e0; /* Darker gray on hover */
+      background-color: #e0e0e0;
+      /* Darker gray on hover */
     }
 
     #author {
@@ -62,46 +81,52 @@
       opacity: 0.6;
       pointer-events: none;
     }
+
     #author a {
       color: #888;
       text-decoration: none;
       pointer-events: auto;
     }
+
     #author a:hover {
       text-decoration: underline;
     }
-    
   </style>
 </head>
+
 <body>
   <canvas id="renderCanvas"></canvas>
-  
+
   <div id="controls" style="display: flex; flex-direction: column; gap: 10px;">
-    <div >
-    <button id="prevBtn">◀</button>   
-        <select id="modelSelect"></select>
+    <div>
+      <button id="prevBtn">◀</button>
+      <select id="modelSelect"></select>
       <button id="nextBtn">▶</button>
     </div>
     <div>
       <!-- <select id="cameraSelect"> -->
-        <!-- <option value="default">Default</option> -->
-        <!-- <option value="top">Top</option> -->
-        <!-- <option value="side">Side</option> -->
-        <!-- <option value="free">Freestyle</option> -->
-        
+      <!-- <option value="default">Default</option> -->
+      <!-- <option value="top">Top</option> -->
+      <!-- <option value="side">Side</option> -->
+      <!-- <option value="free">Freestyle</option> -->
+
       <!-- </select> -->
+    </div>
+
   </div>
-  
-</div>
   <div id="author">
     loshdex by <a href="https://x.com/attentionmech" target="_blank">@attentionmech</a>
   </div>
-  
+
   <script type="module">
     import './src/index.js';
 
     // Add button functionality
+
     const select = document.getElementById('modelSelect');
+
+    // Wait until it's populated, then set default
+
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
 
@@ -119,18 +144,13 @@
       }
     });
 
-    // this is another button now
-    
-    const cameraSelect = document.getElementById('cameraSelect');
 
-    cameraSelect.addEventListener('change', () => {
-      cameraSelect.dispatchEvent(new CustomEvent('change-camera', {
-        detail: cameraSelect.value
-      }));
+    modelSelect.addEventListener('change', (event) => {
+      select.dispatchEvent(new Event('change-model'));
     });
-
 
 
   </script>
 </body>
+
 </html>
