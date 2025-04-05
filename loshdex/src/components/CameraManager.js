@@ -25,7 +25,7 @@ export class CameraManager {
     this.setupDragHandler();
   }
 
-  setMode(mode, target = CONFIG.CAMERA_TARGET, extent = 3000) {
+  setMode(mode, target = CONFIG.CAMERA_TARGET, extent = 4000) {
     this.currentMode = mode;
     this.camera.target = target;
     switch (mode) {
