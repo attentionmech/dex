@@ -155,7 +155,6 @@ export class DexModelVisualizer {
     }
     );
 
-    console.log("Moved model root to:", this.modelRoot.position);
   }
 
 }

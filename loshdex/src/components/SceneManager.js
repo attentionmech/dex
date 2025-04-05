@@ -55,7 +55,7 @@ export class SceneManager {
 
 
       // console.log("Loaded model information from Arrow:", this.modelData);
-      console.log("modeldata", this.modelData);
+      // console.log("modeldata", this.modelData);
       return this.modelData;
     } catch (error) {
       console.error("Error loading Arrow file:", error);

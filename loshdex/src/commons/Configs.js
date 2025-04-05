@@ -9,7 +9,7 @@ export const CONFIG = {
   CAMERA_RADIUS: 100,
   CAMERA_TARGET: new Vector3(0, 0, 0),
   DISK_MIN_SIZE: 100,
-  DISK_MAX_SIZE: 800,
+  DISK_MAX_SIZE: 2000,
   DISK_THICKNESS: 40,
   LAYER_MINOR_OFFSET: 5, // or tweak to taste
 
