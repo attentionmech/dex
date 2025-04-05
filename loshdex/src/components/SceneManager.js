@@ -15,6 +15,8 @@ export class SceneManager {
     this.modelData = {};
   }
 
+
+  // TODO: remove from here sometime later
   async loadModelData() {
     try {
       const response = await fetch("/model_info.json");
