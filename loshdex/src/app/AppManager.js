@@ -22,18 +22,24 @@ class AppManager {
 
   // Initialize the application
   async initialize() {
-    await this.sceneManager.loadModelData();
-    this.uiMaker.setupUI(this.sceneManager.modelData, (modelName) =>
+    const modelData = await this.sceneManager.loadModelData(); // Get the resolved modelData
+    this.uiMaker.setupUI(modelData, (modelName) =>
       this.sceneManager.renderModel(modelName)
     );
     this.startRenderLoop();
     this.setupResizeHandler();
     this.setupPanelHandler();
+
+    // Trigger initial render if data is loaded and there are models
+    if (Object.keys(modelData?.modelLayerData || {}).length > 0) {
+      const firstModelName = Object.keys(modelData.modelLayerData)[0];
+      this.sceneManager.renderModel(firstModelName);
+    }
   }
 
 
   setupPanelHandler(){
-  
+
   }
 
   // Start the render loop
