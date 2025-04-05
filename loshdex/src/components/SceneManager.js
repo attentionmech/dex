@@ -1,9 +1,6 @@
 import { DexModelManager } from "./DexModelManager";
 import { tableFromIPC } from "apache-arrow";
 
-
-
-
 // Updated SceneManager class
 export class SceneManager {
   constructor(scene, cameraManager, uiComponents, dexModelVisualizer) {
@@ -29,12 +26,9 @@ export class SceneManager {
       var rows = [];
   
       for (const row of table) {
-        // Convert each row to a JSON object          
-
           rows.push(row.toJSON())          
       }
 
-      // sort rows by id field
       rows.sort((a, b) => Number(a.id) - Number(b.id));
       
       this.modelData = rows.reduce((acc, row) => {
@@ -47,15 +41,13 @@ export class SceneManager {
         }
         row["name"] = row["param_name"];
         row["numel"] = Number(row["numel"]);
+        row["shape"] = row["shape"].split(",").map(Number) ;
         acc[modelName].push(row);
         return acc;
       }
       , {});
 
 
-
-      // console.log("Loaded model information from Arrow:", this.modelData);
-      // console.log("modeldata", this.modelData);
       return this.modelData;
     } catch (error) {
       console.error("Error loading Arrow file:", error);
@@ -63,25 +55,6 @@ export class SceneManager {
       return [];
     }
   }
-
-
-
-
-  // // TODO: remove from here sometime later
-  // async loadModelDataOld() {
-  // try {
-  //   const response = await fetch("/model_info.json");
-  //   if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-  //   const data = await response.json();
-  //   console.log("Loaded model information:", data);
-  //   this.modelData = data;
-  //   return data;
-  // } catch (error) {
-  //   console.error("Error loading JSON:", error);
-  //   this.modelData = {};
-  //   return {};
-  // }
-// }
 
 
 
