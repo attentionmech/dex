@@ -105,7 +105,7 @@ export class DexModelVisualizer {
       this.disks.forEach(disk => {
         const mat = disk.material;
         if (mat) {
-          mat.alpha = 1;
+          mat.alpha = 0.7;
           mat.emissiveColor = mat.diffuseColor.scale(CONFIG.COLOR_EMISSIVE_MULTIPLIERS);
         }
       });
