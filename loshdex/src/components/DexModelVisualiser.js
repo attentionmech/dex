@@ -21,30 +21,6 @@ export class DexModelVisualizer {
     return originalName.replace(/\.\d+\./g, ".");
   }
 
-  createLabelPlane(text, scene) {
-    const dynamicTexture = new DynamicTexture("labelTexture", { width: 1024, height: 128 }, scene, false);
-    dynamicTexture.hasAlpha = true;
-
-    dynamicTexture.drawText(text, null, 80, "bold 100px Arial", "white", "black", true);
-
-    const labelMaterial = new StandardMaterial("labelMaterial", scene);
-    labelMaterial.diffuseTexture = dynamicTexture;
-    labelMaterial.emissiveColor = new Color3(1, 1, 1);
-    labelMaterial.backFaceCulling = false;
-    labelMaterial.alpha = 0.8; // Adjust alpha value for transparency
-
-
-    const plane = MeshBuilder.CreatePlane("labelPlane", { width: 200, height: 50 }, scene);
-    plane.material = labelMaterial;
-    plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
-    plane.renderingGroupId = 2; // Adjust to a higher value for rendering above other objects
-
-    // const glowLayer = new GlowLayer("glow", this.scene);
-    // glowLayer.addExcludedMesh(plane);
-
-
-    return plane;
-  }
 
 
   assignLayerColor(layerName) {
@@ -61,8 +37,13 @@ export class DexModelVisualizer {
 
   createDisks(layerData) {
     const layerSizes = layerData.map(layer => layer.numel);
-    const logMinSize = Math.min(...layerSizes.map(Math.log));
-    const logMaxSize = Math.max(...layerSizes.map(Math.log));
+    const ff = Math.log
+
+
+    const logMinSize = Math.min(...layerSizes.map(ff));
+    const logMaxSize = Math.max(...layerSizes.map(ff));
+    
+    
     let currentPosition = CONFIG.START_POSITION.clone();
     const direction = CONFIG.MODEL_DIRECTION.clone().normalize();
     this.disks = [];
@@ -70,7 +51,7 @@ export class DexModelVisualizer {
     layerData.forEach((layer, index) => {
       const layerCleanName = this.getCleanLayerName(layer.name);
       const tileSize = CONFIG.DISK_MIN_SIZE +
-        ((Math.log(layer.numel) - logMinSize) / (logMaxSize - logMinSize)) *
+        ((ff(layer.numel) - logMinSize) / (logMaxSize - logMinSize)) *
         (CONFIG.DISK_MAX_SIZE - CONFIG.DISK_MIN_SIZE);
   
       const material = new StandardMaterial(`material_layer_${index}`, this.scene);
@@ -93,15 +74,7 @@ export class DexModelVisualizer {
       
       currentPosition.addInPlace(direction.scale(CONFIG.DISK_THICKNESS * CONFIG.DISK_SPACING_MULTIPLIER));
   
-      const labelPlane = this.createLabelPlane(layerCleanName, this.scene);
-      labelPlane.position = disk.position.clone();
       
-      const upVector = direction.clone().cross(new Vector3(0, 1, 0)).length() < 0.1 
-        ? new Vector3(1, 0, 0) 
-        : new Vector3(0, 1, 0);
-      const labelOffset = upVector.scale(tileSize / 2 + 30);
-      labelPlane.position.addInPlace(labelOffset);
-      labelPlane.parent = disk;
   
       disk.material = material;
       disk.actionManager = new ActionManager(this.scene);
