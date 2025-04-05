@@ -107,6 +107,12 @@
 <body>
   <canvas id="renderCanvas"></canvas>
 
+  <!-- index.html or wherever your main container is -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+
   <div id="controls" style="display: flex; flex-direction: column; gap: 10px;">
     <div>
       <button id="prevBtn">◀</button>
@@ -129,6 +135,7 @@
   </div>
 
   <a href="https://x.com/attentionmech" target="_blank" id="twitterLink">@attentionmech</a>
+
 
 
   <script type="module">

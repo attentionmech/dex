@@ -15,30 +15,35 @@ export class SceneManager {
   }
 
   async loadModelData() {
+    const loadingEl = document.getElementById("loading-overlay");
     try {
+      loadingEl.style.display = "flex";
+  
       const [arrowBuffer, jsonlText] = await Promise.all([
         this.fetchFile("/model_info.arrow", "arrayBuffer"),
         this.fetchFile("/config_list.jsonl", "text"),
       ]);
-
+  
       this.parseArrowData(arrowBuffer);
       this.parseConfigJSONL(jsonlText);
-
-
-      // console.log("modeldata", this.modelLayerData);
-      // console.log("modelconfigdata", this.modelConfigData);
-
-      const modelData = {"modelLayerData": this.modelLayerData, "modelConfigData": this.modelConfigData};
+  
+      const modelData = {
+        modelLayerData: this.modelLayerData,
+        modelConfigData: this.modelConfigData,
+      };
       this.modelData = modelData;
-
-      return modelData ;
+  
+      return modelData;
     } catch (error) {
       console.error("Error loading model data:", error);
       this.modelLayerData = {};
       this.modelConfigData = {};
       return { modelData: {}, modelConfigData: {} };
+    } finally {
+      loadingEl.style.display = "none";
     }
   }
+  
 
   async fetchFile(path, type = "text") {
     const response = await fetch(path);
