@@ -22,6 +22,7 @@ export class DexModelVisualizer {
     this.modelRoot = new TransformNode("modelRoot", this.scene);
     this.selectedDisk = null;
     this.disks = [];
+    this.modelConfigData = null;
   }
 
   getCleanLayerName(originalName) {
@@ -40,14 +41,30 @@ export class DexModelVisualizer {
     return this.layerColorAssignments[layerName];
   }
 
-  createDisks(modelData) {
+  formatModelConfig(configData) {
+    return Object.entries(configData)
+      .map(
+        ([key, val]) =>
+          `${key}: ${typeof val === "object" ? JSON.stringify(val) : val}`
+      )
+      .join("\n");
+  }
 
-    console.log(modelData);
+  formatLayerData(layer) {
+    return Object.entries(layer)
+      .map(([key, val]) => {
+        if (typeof val === "number") return `${key}: ${val.toLocaleString()}`;
+        if (typeof val === "object") return `${key}: ${JSON.stringify(val)}`;
+        return `${key}: ${val}`;
+      })
+      .join("\n");
+  }
+
+  createDisks(modelData) {
     const layerData = modelData.modelLayerData;
     const configData = modelData.modelConfigData;
 
-    console.log("modelData", modelData);
-    
+    this.modelConfigData = configData;
 
     const layerSizes = layerData.map(layer => layer.numel);
     const ff = Math.log;
@@ -99,17 +116,15 @@ export class DexModelVisualizer {
       disk.material = material;
       disk.actionManager = new ActionManager(this.scene);
 
-      // Hover: only visual feedback
       disk.actionManager.registerAction(
         new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
           if (disk.material) {
-            disk.material.emissiveColor = new Color3(1, 1, 1); // bright white
+            disk.material.emissiveColor = new Color3(1, 1, 1);
           }
           disk.scaling = new Vector3(1.3, 1.3, 1.3);
         })
       );
 
-      // Unhover: reset visuals
       disk.actionManager.registerAction(
         new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, () => {
           if (disk.material) {
@@ -121,13 +136,10 @@ export class DexModelVisualizer {
         })
       );
 
-      // On click: highlight + update panel
       disk.actionManager.registerAction(
         new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
           this.highlightDisk(disk, this.disks);
-          this.uiComponents.panelText.text = `Name: ${layer.name}\nShape: ${JSON.stringify(
-            layer.shape
-          )}\nParams: ${layer.numel.toLocaleString()}`;
+          this.uiComponents.panelText.text = this.formatLayerData(layer);
         })
       );
 
@@ -135,7 +147,6 @@ export class DexModelVisualizer {
       this.disks.push(disk);
     });
 
-    // Click outside: clear selection
     this.scene.onPointerDown = (evt, pickInfo) => {
       if (
         pickInfo.hit &&
@@ -146,7 +157,9 @@ export class DexModelVisualizer {
       }
 
       this.selectedDisk = null;
-      this.uiComponents.panelText.text = "loshdex";
+      this.uiComponents.panelText.text = this.formatModelConfig(
+        this.modelConfigData
+      );
 
       this.disks.forEach(disk => {
         const mat = disk.material;
@@ -166,6 +179,9 @@ export class DexModelVisualizer {
     const target = CONFIG.START_POSITION.clone().add(
       direction.scale(extent / 2)
     );
+
+    // Show model config initially
+    this.uiComponents.panelText.text = this.formatModelConfig(configData);
 
     return { disks: this.disks, target, extent };
   }

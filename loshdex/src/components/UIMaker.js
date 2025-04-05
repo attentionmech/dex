@@ -1,5 +1,5 @@
 import { Scene, HemisphericLight, Vector3, GlowLayer } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, Rectangle, TextBlock, ScrollViewer } from "@babylonjs/gui";
 import { CONFIG } from "../commons/Configs";
 
 class UIMaker {
@@ -33,34 +33,52 @@ class UIMaker {
   }
 
   // GUI Setup for Info Panel
-  setupInfoPanel() {
-    const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-    const infoPanel = new Rectangle();
-    infoPanel.width = CONFIG.PANEL_WIDTH;
-    infoPanel.height = CONFIG.PANEL_HEIGHT;
-    infoPanel.color = "#FFFFFF";
-    infoPanel.thickness = 0;
-    infoPanel.background = "rgba(0, 0, 0, 0.5)";
-    infoPanel.horizontalAlignment = Rectangle.ALIGN_RIGHT;
-    infoPanel.verticalAlignment = Rectangle.ALIGN_TOP;
-    infoPanel.left = -CONFIG.PANEL_RIGHT_OFFSET;
-    infoPanel.top = CONFIG.PANEL_TOP_OFFSET;
-    infoPanel.isVisible = true;
-    advancedTexture.addControl(infoPanel);
+  // GUI Setup for Info Panel
+setupInfoPanel() {
+  const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-    const panelText = new TextBlock();
-    panelText.text = "loshdex";
-    panelText.color = "white";
-    panelText.fontSize = 16;
-    panelText.textWrapping = true;
-    panelText.paddingLeft = "10px";
-    panelText.paddingRight = "10px";
-    panelText.paddingTop = "10px";
-    panelText.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
-    infoPanel.addControl(panelText);
+  const infoPanel = new Rectangle();
+  infoPanel.width = CONFIG.PANEL_WIDTH;
+  infoPanel.height = CONFIG.PANEL_HEIGHT;
+  infoPanel.color = "#FFFFFF";
+  infoPanel.thickness = 0;
+  infoPanel.background = "rgba(0, 0, 0, 0.5)";
+  infoPanel.horizontalAlignment = Rectangle.ALIGN_RIGHT;
+  infoPanel.verticalAlignment = Rectangle.ALIGN_TOP;
+  infoPanel.left = -CONFIG.PANEL_RIGHT_OFFSET;
+  infoPanel.top = CONFIG.PANEL_TOP_OFFSET;
+  infoPanel.isVisible = true;
 
-    return { advancedTexture, infoPanel, panelText };
-  }
+  // Create ScrollViewer
+  const scrollViewer = new ScrollViewer();
+  scrollViewer.width = 1.0; // Full width of infoPanel
+  scrollViewer.height = 1.0; // Full height of infoPanel
+  scrollViewer.thickness = 0;
+  scrollViewer.barColor = "gray";
+  scrollViewer.color = "white";
+  scrollViewer.background = "transparent";
+  scrollViewer.verticalAlignment = Rectangle.ALIGN_TOP;
+  scrollViewer.horizontalAlignment = Rectangle.ALIGN_LEFT;
+
+  // TextBlock that goes inside scrollViewer
+  const panelText = new TextBlock();
+  panelText.text = "loshdex";
+  panelText.color = "white";
+  panelText.fontSize = 16;
+  panelText.textWrapping = true;
+  panelText.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
+  panelText.paddingLeft = "10px";
+  panelText.paddingRight = "10px";
+  panelText.paddingTop = "10px";
+  panelText.resizeToFit = true; // IMPORTANT: this enables scroll to work
+
+  scrollViewer.addControl(panelText);
+  infoPanel.addControl(scrollViewer);
+  advancedTexture.addControl(infoPanel);
+
+  return { advancedTexture, infoPanel, panelText };
+}
+
 
   // Scene Management
   clearScene(disks) {
