@@ -21,11 +21,11 @@ export class CameraManager {
     this.isDragging = false;
     this.lastMouseX = null;
     this.currentMode = "default";
-    this.setMode("free"); // Initial mode
+    this.setMode("default"); // Initial mode
     this.setupDragHandler();
   }
 
-  setMode(mode, target = CONFIG.CAMERA_TARGET, extent = 4000) {
+  setMode(mode, target = CONFIG.CAMERA_TARGET, extent = 1000) {
     this.currentMode = mode;
     this.camera.target = target;
     switch (mode) {

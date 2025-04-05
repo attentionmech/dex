@@ -4,8 +4,8 @@ import { Color3, Vector3 } from "@babylonjs/core";
 
 export const CONFIG = {
   BACKGROUND_COLOR: new Color3(0.1, 0.1, 0.1),
-  CAMERA_ALPHA: Math.PI / 3,
-  CAMERA_BETA: Math.PI / 2.2,
+  CAMERA_ALPHA: Math.PI / 4,
+  CAMERA_BETA: Math.PI / 3,
   CAMERA_RADIUS: 100,
   CAMERA_TARGET: new Vector3(0, 0, 0),
   DISK_MIN_SIZE: 100,
@@ -23,7 +23,7 @@ export const CONFIG = {
   PANEL_HEIGHT: "150px",
   PANEL_RIGHT_OFFSET: -40,
   PANEL_TOP_OFFSET: 40,
-  START_POSITION: new Vector3(0, -2500, 0), // Default starting position as Vector3 (x, y, z)
-  MODEL_DIRECTION: new Vector3(0,1, 0),  // Default direction as Vector3 (x-axis)};
-  MOVE_SPEED: 5
+  START_POSITION: new Vector3(0, 0, 0), // Default starting position as Vector3 (x, y, z)
+  MODEL_DIRECTION: new Vector3(-1,0, 0),  // Default direction as Vector3 (x-axis)};
+  MOVE_SPEED: 60
 }
