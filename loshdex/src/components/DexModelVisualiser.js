@@ -15,7 +15,7 @@ export class DexModelVisualizer {
 
   // Extract layer number from name (h.25.attn.c_proj.weight -> 25)
   getLayerNumber(name) {
-    const match = name.match(/h\.(\d+)\./);
+    const match = name.match(/\.(\d+)\./);
     return match ? parseInt(match[1]) : -1;
   }
 
@@ -222,7 +222,7 @@ export class DexModelVisualizer {
   createLayerLabel(layerNum, position, direction) {
     // This is a placeholder - in a real implementation you would create
     // a text label using DynamicTexture or GUI to show the layer number
-    console.log(`Created label for layer ${layerNum} at position ${position}`);
+    // console.log(`Created label for layer ${layerNum} at position ${position}`);
   }
 
   clearDisks(disks) {
@@ -251,7 +251,7 @@ export class DexModelVisualizer {
       const component = selectedDisk.componentData;
       this.uiComponents.panelText.text = `Selected: ${component.name}\n` +
         `Shape: ${JSON.stringify(component.shape)}\n` +
-        `Parameters: ${component.numel.toLocaleString()}\n` +
+        `Parameters: ${Number(component.numel).toLocaleString()}\n` +
         `Type: ${this.getComponentType(component.name)}\n` +
         `Layer: ${this.getLayerNumber(component.name)}`;
     }

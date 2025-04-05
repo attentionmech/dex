@@ -33,10 +33,7 @@ class AppManager {
 
 
   setupPanelHandler(){
-    document.getElementById("cameraSelect").addEventListener("change-camera", (e) => {
-      const cameraMode = e.detail; // "default", "top", "side", etc.
-      this.cameraManager.setMode(cameraMode);
-    });    
+  
   }
 
   // Start the render loop
