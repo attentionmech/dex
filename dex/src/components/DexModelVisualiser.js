@@ -23,6 +23,9 @@ export class DexModelVisualizer {
     this.selectedDisk = null;
     this.disks = [];
     this.modelConfigData = null;
+
+    // Add keyboard event listener
+    this.setupKeyboardControls();
   }
 
   getCleanLayerName(originalName) {
@@ -114,6 +117,10 @@ export class DexModelVisualizer {
 
     const layerData = modelData.modelLayerData;
     const configData = modelData.modelConfigData;
+
+    // Store layer data in scene metadata for later access
+    this.scene.metadata = this.scene.metadata || {};
+    this.scene.metadata.modelLayerData = layerData;
 
     this.modelConfigData = configData;
 
@@ -269,6 +276,53 @@ export class DexModelVisualizer {
     this.modelRoot.position.addInPlace(displacement);
     this.disks.forEach((disk) => {
       disk.position = disk.position.add(displacement);
+    });
+  }
+
+  setupKeyboardControls() {
+    window.addEventListener("keydown", (event) => {
+      const moveSpeed = CONFIG.MOVE_SPEED * 10; // Adjust this value to control movement speed
+
+      // If no disk is selected, move the entire model left/right
+      if (!this.selectedDisk) {
+        switch (event.key) {
+          case "ArrowLeft":
+            this.moveModelRoot(new Vector3(+moveSpeed, 0, 0));
+            break;
+          case "ArrowRight":
+            this.moveModelRoot(new Vector3(-moveSpeed, 0, 0));
+            break;
+        }
+      }
+      // If a disk is selected, move selection between disks
+      else {
+        const currentIndex = this.disks.indexOf(this.selectedDisk);
+
+        switch (event.key) {
+          case "ArrowLeft":
+            if (currentIndex > 0) {
+              const newDisk = this.disks[currentIndex - 1];
+              this.highlightDisk(newDisk, this.disks);
+              // Update panel text with new selected layer data
+              const layerData =
+                this.scene.metadata.modelLayerData[currentIndex - 1];
+              this.uiComponents.panelText.text =
+                this.formatLayerData(layerData);
+            }
+            break;
+          case "ArrowRight":
+            if (currentIndex < this.disks.length - 1) {
+              const newDisk = this.disks[currentIndex + 1];
+              this.highlightDisk(newDisk, this.disks);
+              // Update panel text with new selected layer data
+              const layerData =
+                this.scene.metadata.modelLayerData[currentIndex + 1];
+              this.uiComponents.panelText.text =
+                this.formatLayerData(layerData);
+            }
+            break;
+        }
+      }
     });
   }
 }
