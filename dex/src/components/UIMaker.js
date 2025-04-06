@@ -41,8 +41,8 @@ setupInfoPanel() {
   infoPanel.width = CONFIG.PANEL_WIDTH;
   infoPanel.height = CONFIG.PANEL_HEIGHT;
   infoPanel.color = "#FFFFFF";
-  infoPanel.thickness = 2;
-  infoPanel.background = "rgba(0, 0, 0, 0.5)";
+  infoPanel.thickness = 1;
+  infoPanel.background = "rgba(0, 0, 0, 0.1)";
   infoPanel.horizontalAlignment = Rectangle.ALIGN_RIGHT;
   infoPanel.verticalAlignment = Rectangle.ALIGN_TOP;
   infoPanel.left = -CONFIG.PANEL_RIGHT_OFFSET;
@@ -59,17 +59,20 @@ setupInfoPanel() {
   scrollViewer.background = "transparent";
   scrollViewer.verticalAlignment = Rectangle.ALIGN_TOP;
   scrollViewer.horizontalAlignment = Rectangle.ALIGN_LEFT;
+  scrollViewer.paddingLeft = "10px";
+  scrollViewer.paddingTop  = "10px";
 
   // TextBlock that goes inside scrollViewer
   const panelText = new TextBlock();
-  panelText.text = "loshdex";
+  
   panelText.color = "white";
   panelText.fontSize = 16;
   panelText.textWrapping = true;
   panelText.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
   panelText.paddingLeft = "10px";
-  panelText.paddingRight = "10px";
+  // panelText.paddingRight = "10px";
   panelText.paddingTop = "10px";
+
   panelText.resizeToFit = true; // IMPORTANT: this enables scroll to work
 
   scrollViewer.addControl(panelText);

@@ -42,13 +42,36 @@ export class DexModelVisualizer {
   }
 
   formatModelConfig(configData) {
+    const wrapAt = 60;
+  
+    const wrapText = (text, width) => {
+      const words = text.split(' ');
+      const lines = [];
+      let currentLine = '';
+  
+      words.forEach(word => {
+        if ((currentLine + word).length > width) {
+          lines.push(currentLine.trim());
+          currentLine = '';
+        }
+        currentLine += word + ' ';
+      });
+  
+      if (currentLine) lines.push(currentLine.trim());
+  
+      return lines.join('\n');
+    };
+  
     return Object.entries(configData)
-      .map(
-        ([key, val]) =>
-          `${key}: ${typeof val === "object" ? JSON.stringify(val) : val}`
-      )
-      .join("\n");
+      .map(([key, val]) => {
+        let valueStr =
+          typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val);
+        const wrappedValue = wrapText(`${key}: ${valueStr}`, wrapAt);
+        return wrappedValue;
+      })
+      .join('\n-----------------------------\n');
   }
+  
 
   formatLayerData(layer) {
     return Object.entries(layer)
@@ -57,7 +80,7 @@ export class DexModelVisualizer {
         if (typeof val === "object") return `${key}: ${JSON.stringify(val)}`;
         return `${key}: ${val}`;
       })
-      .join("\n");
+      .join("\n------------------------------\n");
   }
 
   createDisks(modelData) {
@@ -185,6 +208,7 @@ export class DexModelVisualizer {
 
     // Show model config initially
     this.uiComponents.panelText.text = this.formatModelConfig(configData);
+
 
     return { disks: this.disks, target, extent };
   }
