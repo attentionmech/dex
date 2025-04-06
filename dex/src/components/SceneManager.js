@@ -1,6 +1,10 @@
 import { DexModelManager } from "./DexModelManager";
 import { tableFromIPC } from "apache-arrow";
 
+import arrowUrl from '../data/model_info.arrow?url';
+import jsonlUrl from '../data/config_list.jsonl?url';
+
+
 export class SceneManager {
   constructor(scene, cameraManager, uiComponents, dexModelVisualizer) {
     this.scene = scene;
@@ -18,16 +22,17 @@ export class SceneManager {
     this.modelData = {}; // New variable for model data
   }
 
+  // TODO: refactor
   async loadModelData() {
     const loadingEl = document.getElementById("loading-overlay");
     try {
       loadingEl.style.display = "flex";
 
       const [arrowBuffer, jsonlText] = await Promise.all([
-        this.fetchFile("/model_info.arrow", "arrayBuffer"),
-        this.fetchFile("/config_list.jsonl", "text"),
+        this.fetchFile(arrowUrl, "arrayBuffer"),
+        this.fetchFile(jsonlUrl, "text"),
       ]);
-
+      
       this.parseArrowData(arrowBuffer);
       this.parseConfigJSONL(jsonlText);
 

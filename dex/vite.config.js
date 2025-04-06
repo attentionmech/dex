@@ -11,6 +11,7 @@ export default defineConfig({
             algorithm: 'gzip',
             ext: '.gz',
             deleteOriginFile: false,
+            filter: /\.(arrow|jsonl|js|css|html)$/i, // compress these
         }),
     ],
 });
