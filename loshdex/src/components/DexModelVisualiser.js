@@ -61,6 +61,9 @@ export class DexModelVisualizer {
   }
 
   createDisks(modelData) {
+
+    this.layerColorAssignments = {};
+
     const layerData = modelData.modelLayerData;
     const configData = modelData.modelConfigData;
 
