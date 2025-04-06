@@ -74,14 +74,36 @@ export class DexModelVisualizer {
   
 
   formatLayerData(layer) {
+    const wrapAt = 40;
+  
+    const wrapText = (text, width) => {
+      const words = text.split(' ');
+      const lines = [];
+      let currentLine = '';
+  
+      words.forEach(word => {
+        if ((currentLine + word).length > width) {
+          lines.push(currentLine.trim());
+          currentLine = '';
+        }
+        currentLine += word + ' ';
+      });
+  
+      if (currentLine) lines.push(currentLine.trim());
+  
+      return lines.join('\n');
+    };
+  
     return Object.entries(layer)
       .map(([key, val]) => {
-        if (typeof val === "number") return `${key}: ${val.toLocaleString()}`;
-        if (typeof val === "object") return `${key}: ${JSON.stringify(val)}`;
-        return `${key}: ${val}`;
+        let valueStr =
+          typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val);
+        const wrappedValue = wrapText(`${key}: ${valueStr}`, wrapAt);
+        return wrappedValue;
       })
-      .join("\n------------------------------\n");
+      .join('\n------------------------------\n');
   }
+  
 
   createDisks(modelData) {
 
