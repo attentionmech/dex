@@ -1,7 +1,7 @@
 import { Engine } from "@babylonjs/core";
 import "@babylonjs/loaders";
 import { CameraManager } from "../components/CameraManager";
-import {  UIMaker } from "../components/UIMaker";
+import { UIMaker } from "../components/UIMaker";
 import { SceneManager } from "../components/SceneManager";
 import { DexModelVisualizer } from "../components/DexModelVisualiser";
 import { CONFIG } from "../commons/Configs";
@@ -11,13 +11,20 @@ class AppManager {
     this.canvas = document.getElementById(canvasId);
     this.engine = new Engine(this.canvas, true);
     this.uiMaker = new UIMaker(this.engine);
-    this.dexModelVisualizer = new DexModelVisualizer(this.uiMaker.scene, this.uiMaker.uiComponents); // Create here
-    this.cameraManager = new CameraManager(this.uiMaker.scene, this.canvas,this.dexModelVisualizer);
+    this.dexModelVisualizer = new DexModelVisualizer(
+      this.uiMaker.scene,
+      this.uiMaker.uiComponents,
+    ); // Create here
+    this.cameraManager = new CameraManager(
+      this.uiMaker.scene,
+      this.canvas,
+      this.dexModelVisualizer,
+    );
     this.sceneManager = new SceneManager(
       this.uiMaker.scene,
       this.cameraManager,
       this.uiMaker.uiComponents, // for hooks
-      this.dexModelVisualizer
+      this.dexModelVisualizer,
     );
   }
 
@@ -25,14 +32,20 @@ class AppManager {
   async initialize() {
     const modelData = await this.sceneManager.loadModelData(); // Get the resolved modelData
     this.uiMaker.setupUI(modelData, (modelName) =>
-      this.sceneManager.renderModel(modelName)
+      this.sceneManager.renderModel(modelName),
     );
     this.startRenderLoop();
     this.setupResizeHandler();
     this.setupPanelHandler();
 
-    if (modelData?.modelLayerData && Object.keys(modelData.modelLayerData).length > 0) {
-      if (CONFIG.DEFAULT_MODEL && modelData.modelLayerData.hasOwnProperty(CONFIG.DEFAULT_MODEL)) {
+    if (
+      modelData?.modelLayerData &&
+      Object.keys(modelData.modelLayerData).length > 0
+    ) {
+      if (
+        CONFIG.DEFAULT_MODEL &&
+        modelData.modelLayerData.hasOwnProperty(CONFIG.DEFAULT_MODEL)
+      ) {
         this.sceneManager.renderModel(CONFIG.DEFAULT_MODEL);
         const modelSelector = document.getElementById("modelSelect");
         if (modelSelector) {
@@ -46,10 +59,7 @@ class AppManager {
     }
   }
 
-
-  setupPanelHandler(){
-
-  }
+  setupPanelHandler() {}
 
   // Start the render loop
   startRenderLoop() {

@@ -17,14 +17,14 @@ export const CONFIG = {
   COLOR_EMISSIVE_MULTIPLIERS: 0.1,
   DISK_SPACING_MULTIPLIER: 3,
   STARTING_Y_POSITION: 0,
-  
+
   PANEL_WIDTH: "400px",
   PANEL_HEIGHT: "400px",
   PANEL_RIGHT_OFFSET: -30,
   PANEL_TOP_OFFSET: 80,
   START_POSITION: new Vector3(2000, 0, 0), // Default starting position as Vector3 (x, y, z)
-  MODEL_DIRECTION: new Vector3(-1,0, 0),  // Default direction as Vector3 (x-axis)};
+  MODEL_DIRECTION: new Vector3(-1, 0, 0), // Default direction as Vector3 (x-axis)};
   MOVE_SPEED: 60,
 
   DEFAULT_MODEL: "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
-}
+};

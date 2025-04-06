@@ -1,8 +1,6 @@
 import { CONFIG } from "../commons/Configs";
 import { ArcRotateCamera, Vector3, PointerEventTypes } from "@babylonjs/core";
 
-
-
 export class CameraManager {
   constructor(scene, canvas, dexModelVisualizer) {
     this.camera = new ArcRotateCamera(
@@ -11,7 +9,7 @@ export class CameraManager {
       CONFIG.CAMERA_BETA,
       CONFIG.CAMERA_RADIUS,
       CONFIG.CAMERA_TARGET,
-      scene
+      scene,
     );
     this.camera.minZ = 1;
     this.camera.maxZ = 200000;
@@ -73,7 +71,7 @@ export class CameraManager {
             this.lastMouseX = evt.clientX;
           }
           break;
-  
+
         case PointerEventTypes.POINTERMOVE:
           if (this.isDragging && this.currentMode !== "free") {
             const currentMouseX = evt.clientX;
@@ -82,7 +80,7 @@ export class CameraManager {
             this.lastMouseX = currentMouseX;
           }
           break;
-  
+
         case PointerEventTypes.POINTERUP:
           this.isDragging = false;
           this.lastMouseX = null;
@@ -90,10 +88,8 @@ export class CameraManager {
       }
     });
   }
-  
 
   moveModel(deltaX) {
-    
     const direction = CONFIG.MODEL_DIRECTION.clone().normalize();
     const moveSpeed = CONFIG.MOVE_SPEED; // Adjust this sensitivity as needed
     const displacement = direction.scale(deltaX * moveSpeed);

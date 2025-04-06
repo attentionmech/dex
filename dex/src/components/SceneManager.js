@@ -7,7 +7,11 @@ export class SceneManager {
     this.cameraManager = cameraManager;
 
     this.uiComponents = uiComponents;
-    this.dexModelManager = new DexModelManager(scene, uiComponents, dexModelVisualizer);
+    this.dexModelManager = new DexModelManager(
+      scene,
+      uiComponents,
+      dexModelVisualizer,
+    );
 
     this.modelLayerData = {};
     this.modelConfigData = {}; // New variable for JSONL config data
@@ -18,21 +22,21 @@ export class SceneManager {
     const loadingEl = document.getElementById("loading-overlay");
     try {
       loadingEl.style.display = "flex";
-  
+
       const [arrowBuffer, jsonlText] = await Promise.all([
         this.fetchFile("/model_info.arrow", "arrayBuffer"),
         this.fetchFile("/config_list.jsonl", "text"),
       ]);
-  
+
       this.parseArrowData(arrowBuffer);
       this.parseConfigJSONL(jsonlText);
-  
+
       const modelData = {
         modelLayerData: this.modelLayerData,
         modelConfigData: this.modelConfigData,
       };
       this.modelData = modelData;
-  
+
       return modelData;
     } catch (error) {
       console.error("Error loading model data:", error);
@@ -43,12 +47,14 @@ export class SceneManager {
       loadingEl.style.display = "none";
     }
   }
-  
 
   async fetchFile(path, type = "text") {
     const response = await fetch(path);
-    if (!response.ok) throw new Error(`Failed to fetch ${path}: ${response.status}`);
-    return type === "arrayBuffer" ? await response.arrayBuffer() : await response.text();
+    if (!response.ok)
+      throw new Error(`Failed to fetch ${path}: ${response.status}`);
+    return type === "arrayBuffer"
+      ? await response.arrayBuffer()
+      : await response.text();
   }
 
   parseArrowData(arrayBuffer) {
