@@ -2,7 +2,7 @@
 # dependencies = [
 #   "huggingface_hub",
 #   "transformers",
-#   "torch",
+#   "torch==2.5.0",
 #   "pandas",
 #   "pyarrow",
 # ]
@@ -172,12 +172,27 @@ def finalize_arrow(temp_path, final_path):
     print(f"Renamed {temp_path} to {final_path}")
 
 
-def append_config_to_jsonl(config, model_name, file_path):
+def truncate_value(val, max_len=50):
+    if isinstance(val, str):
+        return val[:max_len]
+    elif isinstance(val, list):
+        return [truncate_value(v, max_len) for v in val]
+    elif isinstance(val, dict):
+        return {k: truncate_value(v, max_len) for k, v in val.items()}
+    else:
+        return val  # leave numbers, bools, etc., unchanged
+
+
+def append_config_to_jsonl(config, model_name, file_path, max_val_len=50):
     try:
         with open(file_path, "a", encoding="utf-8") as f:
             data = config.to_dict()
             data["model_name"] = model_name
-            json.dump(data, f)
+
+            # Truncate long values in config
+            truncated_data = {k: truncate_value(v, max_val_len) for k, v in data.items()}
+
+            json.dump(truncated_data, f)
             f.write("\n")
     except Exception as e:
         print(f"Failed to write config for {model_name}: {e}")
