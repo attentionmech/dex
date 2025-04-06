@@ -1,8 +1,17 @@
 import { defineConfig } from "vite";
+import viteCompression from "vite-plugin-compression";
 
 export default defineConfig({
-  base: "./", // important if you deploy under a subpath
-  build: {
-    outDir: "dist", // default
-  },
+    base: "./",
+    build: {
+        outDir: "dist",
+    },
+    plugins: [
+        viteCompression({
+            algorithm: 'gzip',
+            ext: '.gz',
+            deleteOriginFile: false,
+        }),
+    ],
 });
+
