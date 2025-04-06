@@ -43,12 +43,12 @@ export class DexModelVisualizer {
 
   formatModelConfig(configData) {
     const wrapAt = 60;
-  
+
     const wrapText = (text, width) => {
       const words = text.split(' ');
       const lines = [];
       let currentLine = '';
-  
+
       words.forEach(word => {
         if ((currentLine + word).length > width) {
           lines.push(currentLine.trim());
@@ -56,12 +56,12 @@ export class DexModelVisualizer {
         }
         currentLine += word + ' ';
       });
-  
+
       if (currentLine) lines.push(currentLine.trim());
-  
+
       return lines.join('\n');
     };
-  
+
     return Object.entries(configData)
       .map(([key, val]) => {
         let valueStr =
@@ -71,16 +71,16 @@ export class DexModelVisualizer {
       })
       .join('\n-----------------------------\n');
   }
-  
+
 
   formatLayerData(layer) {
     const wrapAt = 40;
-  
+
     const wrapText = (text, width) => {
       const words = text.split(' ');
       const lines = [];
       let currentLine = '';
-  
+
       words.forEach(word => {
         if ((currentLine + word).length > width) {
           lines.push(currentLine.trim());
@@ -88,13 +88,14 @@ export class DexModelVisualizer {
         }
         currentLine += word + ' ';
       });
-  
+
       if (currentLine) lines.push(currentLine.trim());
-  
+
       return lines.join('\n');
     };
-  
+
     return Object.entries(layer)
+      .filter(([key]) => !["id", "file_path", "is_shared", "param_name", "level"].includes(key))
       .map(([key, val]) => {
         let valueStr =
           typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val);
@@ -102,8 +103,9 @@ export class DexModelVisualizer {
         return wrappedValue;
       })
       .join('\n------------------------------\n');
+
   }
-  
+
 
   createDisks(modelData) {
 
@@ -129,7 +131,7 @@ export class DexModelVisualizer {
       const tileSize =
         CONFIG.DISK_MIN_SIZE +
         ((ff(layer.numel) - logMinSize) / (logMaxSize - logMinSize)) *
-          (CONFIG.DISK_MAX_SIZE - CONFIG.DISK_MIN_SIZE);
+        (CONFIG.DISK_MAX_SIZE - CONFIG.DISK_MIN_SIZE);
 
       const material = new StandardMaterial(
         `material_layer_${index}`,
