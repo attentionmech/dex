@@ -96,11 +96,21 @@
       text-decoration: underline;
     }
 
-    #twitterLink {
+    .footer-links {
       position: absolute;
-      bottom: 10px;
-      left: 20px;
-      background-color: #000000;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      z-index: 1000;
+    }
+    
+
+    .footer-link {
+      display: flex;
+      align-items: center;
+      background-color: #000;
       color: white;
       padding: 8px 12px;
       border-radius: 20px;
@@ -109,11 +119,21 @@
       font-weight: bold;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
       transition: background-color 0.3s ease;
-      z-index: 1000;
     }
 
-    #twitterLink:hover {
+    .footer-link:hover {
       background-color: #0d8ddb;
+    }
+
+    .footer-link.github:hover {
+      background-color: #24292f;
+    }
+
+    .footer-link svg {
+      margin-right: 6px;
+      fill: white;
+      width: 16px;
+      height: 16px;
     }
 
     #helpPanel {
@@ -173,10 +193,19 @@
   </div>
 
   <div id="author">
-    loshdex by <a href="https://x.com/attentionmech" target="_blank">@attentionmech</a>
+    <a href="https://getlosh.xyz">losh</a> by <a href="https://x.com/attentionmech" target="_blank">@attentionmech</a>
   </div>
 
-  <a href="https://x.com/attentionmech" target="_blank" id="twitterLink">@attentionmech</a>
+  <!-- Social Links -->
+  <div class="footer-links">
+    <a href="https://x.com/attentionmech" target="_blank" class="footer-link twitter">@attentionmech</a>
+    <a href="https://github.com/attentionmech/dex" target="_blank" class="footer-link github">
+      <svg viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 005.47 7.59c.4.07.55-.17.55-.38v-1.31C4 14.91 3.48 13.73 3.48 13.73c-.36-.91-.88-1.15-.88-1.15-.72-.5.06-.49.06-.49.79.06 1.2.82 1.2.82.71 1.2 1.87.86 2.33.66.07-.52.28-.86.51-1.06-2.22-.25-4.56-1.11-4.56-4.93 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.28.1-2.67 0 0 .84-.27 2.75 1.02A9.56 9.56 0 018 3.53a9.6 9.6 0 012.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.39.2 2.42.1 2.67.64.7 1.03 1.59 1.03 2.68 0 3.83-2.34 4.68-4.57 4.93.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
+      </svg>
+      GitHub
+    </a>
+  </div>
 
   <!-- Floating Help Panel -->
   <div id="helpPanel">
