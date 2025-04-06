@@ -170,6 +170,9 @@ export class DexModelVisualizer {
             disk.material.emissiveColor = new Color3(1, 1, 1);
           }
           disk.scaling = new Vector3(1.3, 1.3, 1.3);
+          const hoverBox = document.getElementById("hoverLayerBox");
+          hoverBox.innerText = layer.name;
+          hoverBox.style.display = "block";
         })
       );
 
@@ -181,6 +184,9 @@ export class DexModelVisualizer {
             );
           }
           disk.scaling = new Vector3(1, 1, 1);
+
+          const hoverBox = document.getElementById("hoverLayerBox");
+          hoverBox.style.display = "none";
         })
       );
 

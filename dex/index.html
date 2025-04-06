@@ -214,6 +214,25 @@
       color: #fd971f;
     }
     
+    #hoverLayerBox {
+      position: absolute;
+      bottom: 100px; /* pushes it above the social links */
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.85);
+      color: #f8f8f2;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 0.95em;
+      white-space: nowrap;
+      z-index: 1000;
+      pointer-events: none;
+      display: none;
+      border: 1px solid #999;
+    }
+    
+
+
   </style>
 </head>
 
@@ -265,6 +284,9 @@
       <li><strong>Dropdown:</strong> Select other models</li>
     </ul>
   </div>
+
+  <div id="hoverLayerBox"></div>
+
 
   <script type="module">
     import './src/index.js';
