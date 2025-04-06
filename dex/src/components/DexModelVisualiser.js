@@ -287,10 +287,10 @@ export class DexModelVisualizer {
       if (!this.selectedDisk) {
         switch (event.key) {
           case "ArrowLeft":
-            this.moveModelRoot(new Vector3(-moveSpeed, 0, 0));
+            this.moveModelRoot(new Vector3(+moveSpeed, 0, 0));
             break;
           case "ArrowRight":
-            this.moveModelRoot(new Vector3(moveSpeed, 0, 0));
+            this.moveModelRoot(new Vector3(-moveSpeed, 0, 0));
             break;
         }
       }
