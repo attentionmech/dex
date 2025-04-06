@@ -25,5 +25,7 @@ export const CONFIG = {
   PANEL_TOP_OFFSET: 100,
   START_POSITION: new Vector3(0, 0, 0), // Default starting position as Vector3 (x, y, z)
   MODEL_DIRECTION: new Vector3(-1,0, 0),  // Default direction as Vector3 (x-axis)};
-  MOVE_SPEED: 60
+  MOVE_SPEED: 60,
+
+  DEFAULT_MODEL: "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
 }

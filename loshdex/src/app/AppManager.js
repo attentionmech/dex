@@ -4,6 +4,7 @@ import { CameraManager } from "../components/CameraManager";
 import {  UIMaker } from "../components/UIMaker";
 import { SceneManager } from "../components/SceneManager";
 import { DexModelVisualizer } from "../components/DexModelVisualiser";
+import { CONFIG } from "../commons/Configs";
 
 class AppManager {
   constructor(canvasId) {
@@ -30,10 +31,18 @@ class AppManager {
     this.setupResizeHandler();
     this.setupPanelHandler();
 
-    // Trigger initial render if data is loaded and there are models
-    if (Object.keys(modelData?.modelLayerData || {}).length > 0) {
-      const firstModelName = Object.keys(modelData.modelLayerData)[0];
-      this.sceneManager.renderModel(firstModelName);
+    if (modelData?.modelLayerData && Object.keys(modelData.modelLayerData).length > 0) {
+      if (CONFIG.DEFAULT_MODEL && modelData.modelLayerData.hasOwnProperty(CONFIG.DEFAULT_MODEL)) {
+        this.sceneManager.renderModel(CONFIG.DEFAULT_MODEL);
+        const modelSelector = document.getElementById("modelSelect");
+        if (modelSelector) {
+          modelSelector.value = CONFIG.DEFAULT_MODEL; // Optionally set the dropdown
+        }
+      } else {
+        // If DEFAULT_MODEL is not set or invalid, render the first model
+        const firstModelName = Object.keys(modelData.modelLayerData)[0];
+        this.sceneManager.renderModel(firstModelName);
+      }
     }
   }
 
