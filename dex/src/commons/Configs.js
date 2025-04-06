@@ -19,8 +19,8 @@ export const CONFIG = {
   STARTING_Y_POSITION: 0,
   
   PANEL_WIDTH: "400px",
-  PANEL_HEIGHT: "500px",
-  PANEL_RIGHT_OFFSET: -40,
+  PANEL_HEIGHT: "400px",
+  PANEL_RIGHT_OFFSET: -50,
   PANEL_TOP_OFFSET: 80,
   START_POSITION: new Vector3(-200, 0, 0), // Default starting position as Vector3 (x, y, z)
   MODEL_DIRECTION: new Vector3(-1,0, 0),  // Default direction as Vector3 (x-axis)};
