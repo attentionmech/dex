@@ -14,3 +14,12 @@
 # how this works
 
 - model repos on hf contains metadata files and the transformers repo contains the classes which are supposed to handle a model. we extract that information and save it in assets so that all of this can run in browser. we use torch device meta to avoiding loading stuff into memory.
+
+
+# citation
+
+@article{attentionmech2025dex,
+  title={dex: interactive visual explorer for open source LLMs},
+  author={attentionmech},
+  year={2025}
+}
