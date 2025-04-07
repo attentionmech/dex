@@ -1,6 +1,7 @@
 # dex
 
-![image](https://github.com/user-attachments/assets/8a70d03a-1b26-4dd6-a733-725133ca374c)
+![gifdemodex](https://github.com/user-attachments/assets/89098710-7d42-442b-a306-8835ff8a88a2)
+
 
 
 # setup instructions
