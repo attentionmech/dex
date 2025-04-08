@@ -7,7 +7,7 @@ Visual Explorer for LLMs
 
 # demo
 
-<a href="https://getlosh.xyz/dex">live demo</a>
+<a href="https://getlosh.xyz/dex">go to live demo</a>
 
 ![gifdemodex](https://github.com/user-attachments/assets/89098710-7d42-442b-a306-8835ff8a88a2)
 
