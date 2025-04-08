@@ -1,6 +1,6 @@
 # dex
 
-# webui
+Visual Explorer for LLMs
 
 ![image](https://github.com/user-attachments/assets/ca5d0aa8-4b04-4045-ac7a-5faf27fb4af1)
 
