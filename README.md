@@ -27,8 +27,14 @@
 
 # citation
 
+```
 @article{attentionmech2025dex,
   title={dex: interactive visual explorer for open source LLMs},
   author={attentionmech},
   year={2025}
 }
+```
+
+# trivia
+
+[This is the post](https://x.com/attentionmech/status/1907967237744468220) where it got started, and this is [where it got viral](https://x.com/attentionmech/status/1908677321688506469).
