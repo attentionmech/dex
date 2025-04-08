@@ -1,5 +1,14 @@
 # dex
 
+# webui
+
+![image](https://github.com/user-attachments/assets/ca5d0aa8-4b04-4045-ac7a-5faf27fb4af1)
+
+
+# demo
+
+<a href="https://getlosh.xyz/dex">live demo</a>
+
 ![gifdemodex](https://github.com/user-attachments/assets/89098710-7d42-442b-a306-8835ff8a88a2)
 
 
