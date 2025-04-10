@@ -11,12 +11,8 @@ Visual Pokedex for LLMs
 
 ![gifdemodex](https://github.com/user-attachments/assets/89098710-7d42-442b-a306-8835ff8a88a2)
 
-
-
 # setup instructions
 
-- we first need to get data from huggingface. for this `scripts/config_download.py` can be run via `uv run` like this: `uv run scripts/config_download.py --output dex/public/model_info.arrow --config_output dex/public/config_list.jsonl --limit 100`
-- previous step will put the data files in `public/` folder.
 - after this just do `npm install` and `npm run dev` in the `dex` folder. This should start the application.
 - for deploying to remote server use `npm run build`
 
