@@ -26,19 +26,6 @@ class AppManager {
       this.uiMaker.uiComponents, // for hooks
       this.dexModelVisualizer,
     );
-
-    window.addEventListener("message", (event) => {
-      // optionally filter by origin
-      // if (event.origin !== "https://colab.research.google.com") return;
-    
-      if (event.data?.type === "LOAD_MODEL_DATA") {
-        console.log("Got data:", event.data.data);
-        // Now use the data to update state / render / etc
-      }
-    });
-    
-
-
   }
 
   // Initialize the application

@@ -16,6 +16,7 @@
     "@babylonjs/core": "^8.1.1",
     "@babylonjs/gui": "^8.1.1",
     "@babylonjs/loaders": "^8.1.1",
-    "apache-arrow": "^19.0.1"
+    "apache-arrow": "^19.0.1",
+    "pako": "^2.1.0"
   }
 }
