@@ -172,6 +172,8 @@ def notebook_dex(model_names, height=600, width=800, base_url="https://getlosh.x
         base_url (str): Base visualization URL.
     """
     
+    if not model_names:
+        return IFrame(base_url, width=width, height=height)
 
     if isinstance(model_names, str):
         model_names = [model_names]
