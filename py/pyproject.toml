@@ -12,7 +12,8 @@ dependencies = [
     "transformers",
     "huggingface_hub",
     "pandas",
-    "pyarrow"
+    "pyarrow",
+    "ipython",
 ]
 
 [project.scripts]

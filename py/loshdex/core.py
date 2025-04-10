@@ -12,10 +12,7 @@ import json
 import argparse
 import pyarrow as pa
 from pyarrow import ipc
-
-
-
-
+from IPython.display import IFrame
 
 
 def get_full_class_name(obj):
@@ -105,13 +102,14 @@ def truncate_value(val, max_len=50):
         return val
 
 
-def extract_model_data(model_names, max_val_len=50):
+def extract_model_data(model_names, max_val_len=50, use_meta_device=True):
     config_list = []
     all_param_infos = []
     
     current_default_device = torch.empty(0).device
     
-    torch.set_default_device("meta")
+    if use_meta_device:
+        torch.set_default_device("meta")
 
     try:
         for model_name in model_names:
@@ -131,7 +129,9 @@ def extract_model_data(model_names, max_val_len=50):
                 print(f"Failed to process {model_name}: {e}")
                 continue
     finally:
-        torch.set_default_device(current_default_device)
+        
+        if use_meta_device:
+            torch.set_default_device(current_default_device)
         
     df = pd.DataFrame(all_param_infos)
     return {
@@ -158,6 +158,47 @@ def parse_args():
     parser.add_argument("--output", type=str, default="model_info.arrow")
     parser.add_argument("--config_output", type=str, default="config_list.jsonl")
     return parser.parse_args()
+
+
+
+def notebook_dex(model_names, height=600, width=800, base_url="https://getlosh.xyz/dex", use_meta_device=True):
+    """
+    Renders an iframe to visualize model metadata on getlosh.xyz/dex.
+
+    Args:
+        model_names (str or list of str): One or more model names to visualize.
+        height (int): Height of the iframe.
+        width (int): Width of the iframe.
+        base_url (str): Base visualization URL.
+    """
+    
+
+    if isinstance(model_names, str):
+        model_names = [model_names]
+
+    result = extract_model_data(model_names, use_meta_device=use_meta_device)
+
+    def compress_and_encode(obj):
+        import json, zlib, base64
+        json_str = json.dumps(obj)
+        compressed = zlib.compress(json_str.encode("utf-8"))
+        b64_encoded = base64.urlsafe_b64encode(compressed).decode("utf-8")
+        return b64_encoded
+
+    arrow_json = result["arrow_data"].to_dict(orient="records")
+    config_json = result["config_list"]
+
+    arrow_encoded = compress_and_encode(arrow_json)
+    config_encoded = compress_and_encode(config_json)
+
+    import urllib.parse
+    query_params = {
+        "arrow": arrow_encoded,
+        "config": config_encoded
+    }
+
+    full_url = base_url + "?" + urllib.parse.urlencode(query_params)
+    return IFrame(full_url, width=width, height=height)
 
 
 def main():
