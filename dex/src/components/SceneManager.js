@@ -24,8 +24,8 @@ export class SceneManager {
       loadingEl.style.display = "flex";
 
       const [arrowBuffer, jsonlText] = await Promise.all([
-        this.fetchFile("/model_info.arrow", "arrayBuffer"),
-        this.fetchFile("/config_list.jsonl", "text"),
+        this.fetchFile("/dex/model_info.arrow", "arrayBuffer"),
+        this.fetchFile("/dex/config_list.jsonl", "text"),
       ]);
 
       this.parseArrowData(arrowBuffer);
