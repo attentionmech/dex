@@ -3,7 +3,7 @@ name = "loshdex"
 version = "0.0.1"
 description = "this is helper for https://github.com/attentionmech/dex project"
 authors = [{ name="attentionmech", email="attentionmech@gmail.com" }]
-license = "Apache 2.0"
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.8"
 
